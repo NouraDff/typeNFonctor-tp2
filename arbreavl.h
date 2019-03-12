@@ -120,7 +120,7 @@ ArbreAVL<T>::~ArbreAVL()
 template <class T>
 bool ArbreAVL<T>::contient(const T& element) const
 {
-    // À compléter.
+    if(recherche(racine, element)!=NULL) return true;
     return false;
 }
 
@@ -252,15 +252,16 @@ void ArbreAVL<T>::copier(const Noeud* source, Noeud*& noeud) const
 }
 
 template <class T>
-int  ArbreAVL<T>::hauteur() const{
-    // À compléter.
+int  ArbreAVL<T>::hauteur() const{ // vrm pas sûr... boucle infini??
+    if(max(this)) return max(this)+1;
     return 0;
 }
 
 template <class T>
-const T& ArbreAVL<T>::max(Noeud* n) const
+const T& ArbreAVL<T>::max(Noeud* n) const // vrm pas sûr... boucle infini??
 {
-    // À compléter.
+	if(n) return (hauteur(n->gauche) > hauteur(n->droite) ? hauteur(n->gauche) : hauteur(n->droite)); 
+	return 0;
 }
 
 // L'enlèvement est optionnel (non requise pour le TP2)
@@ -305,9 +306,14 @@ bool ArbreAVL<T>::enlever(Noeud*& noeud, const T& element)
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::debut() const
 {
-    Iterateur iter(*this);
-    iter.courant = racine; //...?
-    return iter;
+	Iterateur iter(*this);
+	iter.courant = racine;
+	if(iter.courant!=NULL)
+		while(iter.courant->gauche!=NULL){
+			iter.chemin.empiler(iter.courant);
+			iter.courant = iter.courant->gauche;
+		}
+	return iter;
 }
 
 template <class T>
@@ -415,17 +421,26 @@ ArbreAVL<T>::Iterateur::Iterateur(const ArbreAVL<T>::Iterateur& a)
     chemin = a.chemin;
 }
 
-// Pré-incrément
+// Pré-incrément (++A)
 template <class T>
 typename ArbreAVL<T>::Iterateur& ArbreAVL<T>::Iterateur::operator++()
 {
-    // À compléter.
-    return *this;
+	assert(courant);
+	Noeud* suivant = courant->droite;
+	while(suivant){
+		chemin.empiler(suivant);
+		suivant = suivant->gauche;
+	}
+	if(!chemin.vide())
+		courant = chemin.depiler();
+	else
+		courant = NULL;
+	return *this;
 }
 
-// Post-incrément
+// Post-incrément (A++)
 template <class T>
-typename ArbreAVL<T>::Iterateur ArbreAVL<T>::Iterateur::operator++(int)
+typename ArbreAVL<T>::Iterateur ArbreAVL<T>::Iterateur::operator++(int) 
 {
     Iterateur copie(*this);
     operator++();
