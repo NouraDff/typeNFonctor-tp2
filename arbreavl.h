@@ -4,7 +4,7 @@
 
    AUTEUR(S):
     1) Noura Djaffri DJAN28569508
-    2) Nom + Code permanent du l'étudiant.e 2
+    2) Laurianne Guindon GUIL22579900
 */
 
 #if !defined(__ARBREAVL_H__)
@@ -306,7 +306,7 @@ template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::debut() const
 {
     Iterateur iter(*this);
-    // À compléter.
+    iter.courant = racine; //...?
     return iter;
 }
 
@@ -319,24 +319,61 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::fin() const
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercher(const T& e) const
 {
-    Iterateur iter(*this);
-    // À compléter.
-    return iter;
+	Iterateur iter(*this);
+	Noeud* n = racine;
+
+	while(n){
+		if(e < n->contenu){
+			iter.chemin.empiler(n);
+			n = n->gauche;
+		}else if(n->contenu < e) n = n->droite;
+		else{
+			iter.courant = n;
+			return iter;
+		}
+	}
+
+	iter.chemin.vider();
+	return iter;
 }
 
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercherEgalOuSuivant(const T& e) const
 {
-    Iterateur iter(*this);
-    // À compléter.
-    return iter;
+	Iterateur iter(*this);
+	Noeud* n = racine, *dernier=NULL;
+	
+	while(n){
+		if(e < n->contenu){
+			dernier = n;  
+			iter.chemin.empiler(n);
+			n = n->gauche; 
+		}else if(n->contenu < e) n = n->droite;  
+		else{
+			iter.courant = n;  
+			return iter;
+	}
+
+	if(dernier!=NULL) return rechercher(dernier->contenu);
+	iter.chemin.vider();
+	return iter;
 }
 
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercherEgalOuPrecedent(const T& e) const
 {
-    // À compléter.
-    return Iterateur(*this);
+	Noeud* n = racine, *dernier=NULL;
+
+	while(n){
+		if(e < n->contenu) n = n->gauche;
+		else if(n->contenu < e){
+			dernier = n;
+			n = n->droite;
+		}else return rechercher(e);
+	}
+
+	if(dernier!=NULL) return rechercher(dernier->contenu);
+	return Iterateur(*this);
 }
 
 template <class T>
