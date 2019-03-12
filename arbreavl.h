@@ -120,7 +120,7 @@ ArbreAVL<T>::~ArbreAVL()
 template <class T>
 bool ArbreAVL<T>::contient(const T& element) const
 {
-    if(recherche(racine, element)!=NULL) return true;
+    if(rechercher(element)) return true;
     return false;
 }
 
@@ -252,16 +252,15 @@ void ArbreAVL<T>::copier(const Noeud* source, Noeud*& noeud) const
 }
 
 template <class T>
-int  ArbreAVL<T>::hauteur() const{ // vrm pas sûr... boucle infini??
-    if(max(this)) return max(this)+1;
-    return 0;
+int  ArbreAVL<T>::hauteur() const{ // vrm pas sûr... boucle infini?? // manque des param??
+	//if(noeud!=NULL) return max(hauteur(noeud->gauche), hauteur(noeud->droite))+1;
+	return 0;
 }
 
 template <class T>
-const T& ArbreAVL<T>::max(Noeud* n) const // vrm pas sûr... boucle infini??
+const T& ArbreAVL<T>::max(Noeud* n) const // 2 var devraient êtres passées...
 {
-	if(n) return (hauteur(n->gauche) > hauteur(n->droite) ? hauteur(n->gauche) : hauteur(n->droite)); 
-	return 0;
+	//return (hauteur(n->gauche) > hauteur(n->droite) ? hauteur(n->gauche) : hauteur(n->droite)); 
 }
 
 // L'enlèvement est optionnel (non requise pour le TP2)
@@ -358,6 +357,7 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercherEgalOuSuivant(const T& e)
 		else{
 			iter.courant = n;  
 			return iter;
+		}
 	}
 
 	if(dernier!=NULL) return rechercher(dernier->contenu);
