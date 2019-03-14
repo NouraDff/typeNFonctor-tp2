@@ -243,6 +243,9 @@ void ArbreAVL<T>::vider(Noeud*& noeud)
 template <class T>
 void ArbreAVL<T>::copier(const Noeud* source, Noeud*& noeud) const
 {
+    if(source == NULL){
+        return; 
+    }
    noeud = new Noeud(source->contenu);
    noeud->equilibre = source->equilibre; 
 
@@ -470,7 +473,7 @@ const T& ArbreAVL<T>::Iterateur::operator *() const
 }
 
 template <class T>
-typename ArbreAVL<T>::Iterateur& ArbreAVL<T>::Iterateur::operator = (const Iterateur& autre){
+typename ArbreAVL<T>::Iterateur& ArbreAVL<T>::Iterateur::operator = (const Iterateur& autre){ 
     assert(&arbre_associe==&autre.arbre_associe);
     courant = autre.courant;
     chemin = autre.chemin;
