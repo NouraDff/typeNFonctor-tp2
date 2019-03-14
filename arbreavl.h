@@ -4,7 +4,7 @@
 
    AUTEUR(S):
     1) Noura Djaffri DJAN28569508
-    2) Nom + Code permanent du l'étudiant.e 2
+    2) Laurianne Guindon GUIL22579900
 */
 
 #if !defined(__ARBREAVL_H__)
@@ -120,6 +120,7 @@ ArbreAVL<T>::~ArbreAVL()
 template <class T>
 bool ArbreAVL<T>::contient(const T& element) const
 {
+<<<<<<< HEAD
     Iterateur iter(*this);
     iter = iter.arbre_associe.rechercher(element); 
 
@@ -130,6 +131,9 @@ bool ArbreAVL<T>::contient(const T& element) const
     if(iter.courant->contenu == element){
         return true; 
     }
+=======
+    if(rechercher(element)) return true;
+>>>>>>> 254d6ecf73f34fa7f8365702202908f4a4f4f87b
     return false;
 }
 
@@ -270,6 +274,7 @@ void ArbreAVL<T>::copier(const Noeud* source, Noeud*& noeud) const
 }
 
 template <class T>
+<<<<<<< HEAD
 int  ArbreAVL<T>::hauteur() const{
     int compteur = 0 ; 
     Iterateur iter(*this);
@@ -281,6 +286,20 @@ int  ArbreAVL<T>::hauteur() const{
             compteur+= 1; 
             continue;
         }
+=======
+int  ArbreAVL<T>::hauteur() const{ // vrm pas sûr... boucle infini?? // manque des param??
+	Iterateur iter(*this);
+	if(iter.courant!=NULL) return max(iter.courant)+1;	// si la hauteur n'est pas déjà définie... prob!?
+	return 0;
+}
+
+template <class T>
+const T& ArbreAVL<T>::max(Noeud* n) const // 2 var devraient êtres passées...
+{
+	int hg =n->gauche->hauteur(), hd = n->droite->hauteur();
+	return (hg > hd ? hg : hd); 
+}
+>>>>>>> 254d6ecf73f34fa7f8365702202908f4a4f4f87b
 
         if(iter.courant->equilibre < 0){
             iter.courant = iter.courant->droite; 
@@ -308,6 +327,7 @@ const T& ArbreAVL<T>::max(Noeud* n) const
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::debut() const
 {
+<<<<<<< HEAD
     Iterateur iter(*this);
     
     while(iter.courant->gauche != NULL){
@@ -315,6 +335,16 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::debut() const
         iter.courant = iter.courant->gauche; 
     }
     return iter;
+=======
+	Iterateur iter(*this);
+	iter.courant = racine;
+	if(iter.courant!=NULL)
+		while(iter.courant->gauche!=NULL){
+			iter.chemin.empiler(iter.courant);
+			iter.courant = iter.courant->gauche;
+		}
+	return iter;
+>>>>>>> 254d6ecf73f34fa7f8365702202908f4a4f4f87b
 }
 
 template <class T>
@@ -326,6 +356,7 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::fin() const
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercher(const T& e) const
 {
+<<<<<<< HEAD
     Iterateur iter(*this);
     iter.courant = iter.arbre_associe.racine; 
 
@@ -354,21 +385,64 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercher(const T& e) const
         }
     }
     return iter;
+=======
+	Iterateur iter(*this);
+	Noeud* n = racine;
+
+	while(n){
+		if(e < n->contenu){
+			iter.chemin.empiler(n);
+			n = n->gauche;
+		}else if(n->contenu < e) n = n->droite;
+		else{
+			iter.courant = n;
+			return iter;
+		}
+	}
+
+	iter.chemin.vider();
+	return iter;
+>>>>>>> 254d6ecf73f34fa7f8365702202908f4a4f4f87b
 }
 
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercherEgalOuSuivant(const T& e) const
 {
-    Iterateur iter(*this);
-    // À compléter.
-    return iter;
+	Iterateur iter(*this);
+	Noeud* n = racine, *dernier=NULL;
+	
+	while(n){
+		if(e < n->contenu){
+			dernier = n;  
+			iter.chemin.empiler(n);
+			n = n->gauche; 
+		}else if(n->contenu < e) n = n->droite;  
+		else{
+			iter.courant = n;  
+			return iter;
+		}
+	}
+
+	if(dernier!=NULL) return rechercher(dernier->contenu);
+	iter.chemin.vider();
+	return iter;
 }
 
 template <class T>
 typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercherEgalOuPrecedent(const T& e) const
 {
-    // À compléter.
-    return Iterateur(*this);
+	Noeud* n = racine, *dernier=NULL;
+
+	while(n){
+		if(e < n->contenu) n = n->gauche;
+		else if(n->contenu < e){
+			dernier = n;
+			n = n->droite;
+		}else return rechercher(e);
+	}
+
+	if(dernier!=NULL) return rechercher(dernier->contenu);
+	return Iterateur(*this);
 }
 
 //-----------------------------------
@@ -412,17 +486,26 @@ ArbreAVL<T>::Iterateur::Iterateur(const ArbreAVL<T>::Iterateur& a)
     chemin = a.chemin;
 }
 
-// Pré-incrément
+// Pré-incrément (++A)
 template <class T>
 typename ArbreAVL<T>::Iterateur& ArbreAVL<T>::Iterateur::operator++()
 {
-    // À compléter.
-    return *this;
+	assert(courant);
+	Noeud* suivant = courant->droite;
+	while(suivant){
+		chemin.empiler(suivant);
+		suivant = suivant->gauche;
+	}
+	if(!chemin.vide())
+		courant = chemin.depiler();
+	else
+		courant = NULL;
+	return *this;
 }
 
-// Post-incrément
+// Post-incrément (A++)
 template <class T>
-typename ArbreAVL<T>::Iterateur ArbreAVL<T>::Iterateur::operator++(int)
+typename ArbreAVL<T>::Iterateur ArbreAVL<T>::Iterateur::operator++(int) 
 {
     Iterateur copie(*this);
     operator++();
