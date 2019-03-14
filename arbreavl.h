@@ -120,7 +120,8 @@ ArbreAVL<T>::~ArbreAVL()
 template <class T>
 bool ArbreAVL<T>::contient(const T& element) const
 {
-    if(rechercher(element)) return true;
+    if(rechercher(element)) 
+        return true;
     return false;
 }
 
@@ -191,9 +192,6 @@ void ArbreAVL<T>::rotationGaucheDroite(Noeud*& racinesousarbre)
     racinesousarbre->gauche = temp->droite;
     temp->droite = racinesousarbre;
     racinesousarbre = temp;
-     std::cout << "Contenu du noeud enfant : " << temp->contenu << " | equilibre avant : " << ea << " | equilibre après : " << nea << std::endl;
-    std::cout << "Contenu du noeud parent : " << racinesousarbre->droite->contenu <<   " | equilibre avant : " << eb << " | equilibre après : " << neb << std::endl;
-    std::cout << std::endl; 
 }
 
 template <class T>
@@ -212,9 +210,6 @@ void ArbreAVL<T>::rotationDroiteGauche(Noeud*& racinesousarbre)
     temp->gauche = racinesousarbre; 
     racinesousarbre = temp; 
 
-    std::cout << "Contenu du noeud parent : " << temp->contenu << " | equilibre avant : " << eb << " | equilibre après : " << neb << std::endl;
-    std::cout << "Contenu du noeud enfant : " << racinesousarbre->gauche->contenu <<   " | equilibre avant : " << ea << " | equilibre après : " << nea << std::endl;
-    std::cout << std::endl; 
 
 }
 
@@ -230,18 +225,18 @@ bool ArbreAVL<T>::vide() const
 template <class T>
 void ArbreAVL<T>::vider(){
   vider(racine);
+  racine = NULL;
 }
 
 template <class T>
 void ArbreAVL<T>::vider(Noeud*& noeud)
 {
-    if(vide()){
-        return; 
-    }
+    if (noeud == NULL)
+        return;    
     vider(noeud->gauche);
     vider(noeud->droite);
     delete noeud; 
-    noeud = NULL;
+    noeud =NULL; 
     
 }
 
@@ -325,7 +320,8 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercher(const T& e) const
 		if(e < n->contenu){
 			iter.chemin.empiler(n);
 			n = n->gauche;
-		}else if(n->contenu < e) n = n->droite;
+		}else if(n->contenu < e) 
+            n = n->droite;
 		else{
 			iter.courant = n;
 			return iter;
