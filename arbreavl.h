@@ -253,14 +253,16 @@ void ArbreAVL<T>::copier(const Noeud* source, Noeud*& noeud) const
 
 template <class T>
 int  ArbreAVL<T>::hauteur() const{ // vrm pas sûr... boucle infini?? // manque des param??
-	//if(noeud!=NULL) return max(hauteur(noeud->gauche), hauteur(noeud->droite))+1;
+	Iterateur iter(*this);
+	if(iter.courant!=NULL) return max(iter.courant)+1;	// si la hauteur n'est pas déjà définie... prob!?
 	return 0;
 }
 
 template <class T>
 const T& ArbreAVL<T>::max(Noeud* n) const // 2 var devraient êtres passées...
 {
-	//return (hauteur(n->gauche) > hauteur(n->droite) ? hauteur(n->gauche) : hauteur(n->droite)); 
+	int hg =n->gauche->hauteur(), hd = n->droite->hauteur();
+	return (hg > hd ? hg : hd); 
 }
 
 // L'enlèvement est optionnel (non requise pour le TP2)
