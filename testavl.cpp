@@ -128,62 +128,93 @@ bool test3()
     int nberreurs=0;
     std::cout << "Test #3 : ArbreAVL AVL (insertion + test d'appartenance)" << std::endl;
     ArbreAVL<int> arbre;
-    for(int i=0;i<20;i+=2)
-       arbre.inserer(i);
-    for(int i=0;i<20;i++)
-        if(arbre.contient(i) != ((i%2)==0)){
-            std::cout << i << " >> Erreur #1 i=" << i << std::endl;
-            nberreurs++;
-        }
-    for(int i=1;i<20;i+=2)
-       arbre.inserer(i);
+         arbre.inserer(4);
+         arbre.inserer(2);
+         arbre.inserer(1);
+         arbre.inserer(5);
+         arbre.inserer(6);
+         arbre.inserer(12);
+         arbre.inserer(21);
+         arbre.inserer(9);
+         arbre.inserer(11);
+         arbre.inserer(10);
+         arbre.inserer(0);
+         arbre.inserer(8);
+         arbre.inserer(32);
+         arbre.inserer(89);
+         arbre.inserer(44);
+         arbre.inserer(55);
+         arbre.inserer(66);
+         arbre.inserer(77);
+         arbre.inserer(88);
+         arbre.inserer(99);
 
-    for(int i=0;i<20;i++)
-        if(!arbre.contient(i)){
-            std::cout << i << " >> Erreur #2 i=" << i << std::endl;
-            nberreurs++;
-        }
+         int h = arbre.hauteur(); 
+         std::cout << h << std::endl; 
+     
 
 
-    ArbreAVL<int> arbre2;
-    for(int i=0;i<20;i+=2)
-       arbre2.inserer(-i);
-    for(int i=1;i<20;i+=2)
-       arbre2.inserer(-i);
 
-    for(int i=0;i<20;i++)
-        if(!arbre2.contient(-i)){
-            std::cout << i << " >> Erreur #3 i=" << i << std::endl;
-            nberreurs++;
-        }
-
-    ArbreAVL<int> arbre3;
-    for(int n=1;n<=500;n++){
-      arbre3.inserer(n);
-      int h = arbre3.hauteur();
-      int nbmin = fib(h);
-      //std::cout << "h=" << h << " i=" << i << " nbmin=" << nbmin << std::endl;
-      if(n<nbmin){
-          std::cout << "Erreur : la hauteur de l'arbre est trop élevé pour le nombre d'éléments"
-                    << std::endl
-                    << "\th=" << h << "\tn=" << n << " nbmin=" << nbmin << std::endl;
-          nberreurs++;
-      }
-    }
     
-    ArbreAVL<int> arbre4;
-    for(int n=1;n<=500;n++){
-      arbre4.inserer(-n);
-      int h = arbre4.hauteur();
-      int nbmin = fib(h);
-      //std::cout << "h=" << h << " i=" << i << " nbmin=" << nbmin << std::endl;
-      if(n<nbmin){
-          std::cout << "Erreur : la hauteur de l'arbre est trop élevé pour le nombre d'éléments"
-                    << std::endl
-                    << "\th=" << h << "\tn=" << n << " nbmin=" << nbmin << std::endl;
-          nberreurs++;
-      }
-    }
+
+  
+    // for(int i=0;i<20;i++)
+    //     if(arbre.contient(i) != ((i%2)==0)){
+    //         std::cout << i << " >> Erreur #1 i=" << i << std::endl;
+    //         nberreurs++;
+    //     }  
+
+
+        
+    // for(int i=1;i<20;i+=2)
+    //    arbre.inserer(i);
+
+    // for(int i=0;i<20;i++)
+    //     if(!arbre.contient(i)){
+    //         std::cout << i << " >> Erreur #2 i=" << i << std::endl;
+    //         nberreurs++;
+    //     }
+
+
+    // ArbreAVL<int> arbre2;
+    // for(int i=0;i<20;i+=2)
+    //    arbre2.inserer(-i);
+    // for(int i=1;i<20;i+=2)
+    //    arbre2.inserer(-i);
+
+    // for(int i=0;i<20;i++)
+    //     if(!arbre2.contient(-i)){
+    //         std::cout << i << " >> Erreur #3 i=" << i << std::endl;
+    //         nberreurs++;
+    //     }
+
+    // ArbreAVL<int> arbre3;
+    // for(int n=1;n<=500;n++){
+    //   arbre3.inserer(n);
+    //   int h = arbre3.hauteur();
+    //   int nbmin = fib(h);
+    //   //std::cout << "h=" << h << " i=" << i << " nbmin=" << nbmin << std::endl;
+    //   if(n<nbmin){
+    //       std::cout << "Erreur : la hauteur de l'arbre est trop élevé pour le nombre d'éléments"
+    //                 << std::endl
+    //                 << "\th=" << h << "\tn=" << n << " nbmin=" << nbmin << std::endl;
+    //       nberreurs++;
+    //   }
+    // }
+    
+    // ArbreAVL<int> arbre4;
+    // for(int n=1;n<=500;n++){
+    //   arbre4.inserer(-n);
+    //   int h = arbre4.hauteur();
+    //   int nbmin = fib(h);
+    //   //std::cout << "h=" << h << " i=" << i << " nbmin=" << nbmin << std::endl;
+    //   if(n<nbmin){
+    //       std::cout << "Erreur : la hauteur de l'arbre est trop élevé pour le nombre d'éléments"
+    //                 << std::endl
+    //                 << "\th=" << h << "\tn=" << n << " nbmin=" << nbmin << std::endl;
+    //       nberreurs++;
+    //   }
+    // }
     if(nberreurs==0)
         std::cout << " ==> OK" << std::endl;
     return nberreurs==0;
@@ -232,8 +263,6 @@ bool test4()
         arbre.inserer(i);
     for(int i=1;i<20;i+=2)
         arbre.inserer(i);
-    for(int i=0;i<20;i++)
-        arbre.enlever(i);
     for(int i=0;i<20;i++)
         if(arbre.contient(i)){
             std::cout << i << "+ >> Erreur" << std::endl;
@@ -460,16 +489,16 @@ int main(int argc, const char** argv)
 {
     bool testsreussis =
         true // Cette ligne est uniquement là afin de pouvoir mettre la ligne suivante en commentaire sans enlever le && de la 2e ligne suivante!
-        && test1()
-        && test2()
+        // && test1()
+        // && test2()
         && test3()
-        && test3b()
-        && test4()
-        && test5()
-        && test6()
-        && test7()
-        && test8()
-        && test9()
+        // && test3b()
+        // && test4()
+        // && test5()
+        // && test6()
+        // && test7()
+        // && test8()
+        // && test9()
         ;
 
     std::cout << std::endl << std::endl
