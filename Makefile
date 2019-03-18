@@ -2,7 +2,7 @@
 CARGS= -lm -std=c++11
 .PHONY: all default testavl clean
 
-all : testavl 
+all : testavl tp2 
 
 default: tp2
 tp2:
