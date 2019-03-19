@@ -4,8 +4,10 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <string.h>
+#include <string>
 #include "arbreavl.h"
+#include "type.h"
+#include "fonctor.h"
 
 using namespace std;
 
@@ -88,6 +90,33 @@ cout << entree << "->" << nom << endl;
     else{
         cerr << "Impossible d'ouvrir le fichier." << endl; 
     }
+
+    // vector<string> boole;
+    // boole.push_back("vrai"); 
+    // boole.push_back("faux"); 
+
+    //  vector<vector<string> > fct { { "vrai", "vrai", "vrai" }, 
+    //                            { "faux", "faux", "faux" }, 
+    //                            { "vrai", "faux", "vrai" } }; 
+    
+    // Fonctor *fonctor = new Fonctor("Boolean", boole, fct); 
+
+    //  ArbreAVL<Fonctor> *tree = new ArbreAVL<Fonctor>(); 
+    //  tree->inserer(*fonctor); 
+    //  cout << *fonctor << endl;
+
+
+    // Type *type= new Type("Toto", boole); 
+
+    // ArbreAVL<Type> *tree1 = new ArbreAVL<Type>(); 
+
+    // tree1->inserer(*type); 
+
+
+    // if(tree1->contient (*type)){
+    //    Type trouve = tree1->rechercheElement(*type); 
+    //     cout << trouve << endl; 
+    // }
 
 	return 0;
 }
