@@ -1,5 +1,5 @@
 #Lab6
-CARGS= -lm -std=c++11
+CARGS= -lm -std=c++11 -g
 .PHONY: all default testavl clean
 
 all : testavl tp2 
