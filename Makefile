@@ -3,7 +3,7 @@ CARGS= -lm -std=c++11
 
 all : testavl tp2 
 
-default: tp2 arbreavl.h type.h
+default: tp2 arbreavl.h type.h fonctor.h
 tp2:
 	@g++ tp2.cpp $(CARGS)
 

@@ -7,7 +7,8 @@ public:
     string identificateur; 
     vector<string> idCollection; 
     friend ostream &operator<<(ostream &os, const Type &type);
-public:
+
+    Type();
     Type(string id, vector<string> idColl);
     ~Type();
      //Constructeur par copie
@@ -24,15 +25,18 @@ public:
 Type::Type(string id, vector<string> idColl)
 {
     identificateur = id; 
-       for (int i=0; i<idColl.size(); i++) {
-            idCollection.push_back(idColl[i]);
-       }
+    for (int i=0; i<idColl.size(); i++) {
+        idCollection.push_back(idColl[i]);
+    }
 
 }
 
 Type::~Type()
 {
+    idCollection.clear(); 
 }
+
+
    bool operator< (Type const& left, Type const& right) {
     if(left.identificateur < right.identificateur){
         return true;
@@ -48,38 +52,14 @@ Type::~Type()
 
 ostream &operator<<(ostream &os, const Type &type)
 {
-    os << "{";
-    for (int i = 0; i < type.idCollection.size(); i++) {
-		os << type.idCollection.at(i) << ", ";
+    os << "{" <<  type.idCollection.at(0);
+    for (int i = 1; i < type.idCollection.size(); i++) {
+		os << ", " << type.idCollection.at(i);
 	}
     os << "}" << endl; 
     
    
 }
 
-
-class Fonctor
-{
-protected:
-    string identificateur; 
-    vector<string> typeCollection;
-    vector<vector<string>> matrice; 
-    friend ostream &operator<<(ostream &os, const Fonctor &fct);
-public:
-    Fonctor(/* args */);
-    ~Fonctor();
-};
-
-Fonctor::Fonctor(/* args */)
-{
-}
-
-Fonctor::~Fonctor()
-{
-}
-ostream &operator<<(ostream &os, const Fonctor &fct)
-{
-    os << fct.identificateur << endl;
-}
 
 
