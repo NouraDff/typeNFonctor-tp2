@@ -13,33 +13,43 @@ using namespace std;
 
 
 int main(int argc, const char** argv){    
-    // vector<string> boole;
-    // boole.push_back("vrai"); 
-    // boole.push_back("faux"); 
-
-    //  vector<vector<string> > fct { { "vrai", "vrai", "vrai" }, 
-    //                            { "faux", "faux", "faux" }, 
-    //                            { "vrai", "faux", "vrai" } }; 
     
-    // Fonctor *fonctor = new Fonctor("Boolean", boole, fct); 
+    ArbreAVL<Fonctor> *tree = new ArbreAVL<Fonctor>(); 
+    
+    vector<string> boole;
+    boole.push_back("vrai"); 
+    boole.push_back("faux"); 
 
-    //  ArbreAVL<Fonctor> *tree = new ArbreAVL<Fonctor>(); 
-    //  tree->inserer(*fonctor); 
-    //  cout << *fonctor << endl;
+    vector<vector<string> > fct { { "vrai", "vrai", "vrai" }, 
+                               { "faux", "faux", "faux" }, 
+                               { "vrai", "faux", "vrai" } }; 
+    Fonctor *fonctor = new Fonctor("CBoolean", boole, fct); 
+    tree->inserer(*fonctor); 
+
+    vector<vector<string> > nb { { "1", "0", "0" }, 
+                               { "1", "1", "1" }, 
+                               { "0", "0", "0" } }; 
+    vector<string> into;
+    boole.push_back("1"); 
+    boole.push_back("0"); 
+
+    Fonctor *fonctor1 = new Fonctor("Binaire", into, nb); 
+    tree->inserer(*fonctor1); 
 
 
-    // Type *type= new Type("Toto", boole); 
+    vector<vector<string> > ou { { "v", "f", "v" }, 
+                               { "f", "v", "v" }, 
+                               { "v", "v", "f" } }; 
+    vector<string> pro;
+    boole.push_back("v"); 
+    boole.push_back("f");
 
-    // ArbreAVL<Type> *tree1 = new ArbreAVL<Type>(); 
+     Fonctor *fonctor2 = new Fonctor("Atchoum", into, nb); 
+    tree->inserer(*fonctor2); 
 
-    // tree1->inserer(*type); 
+    
+    
 
-
-    // if(tree1->contient (*type)){
-    //    Type trouve = tree1->rechercheElement(*type); 
-    //     cout << trouve << endl; 
-    // }
-     
 
 
 }
