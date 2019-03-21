@@ -9,7 +9,7 @@ public:
     friend ostream &operator<<(ostream &os, const Type &type);
 
     Type();
-    Type(string id);
+    Type(string id, vector<string> idColl);
     ~Type();
      //Constructeur par copie
     Type(const Type &type)
@@ -22,9 +22,13 @@ public:
     }
 };
 
-Type::Type(string id)
+Type::Type(string id, vector<string> idColl)
 {
     identificateur = id; 
+    for (int i=0; i<idColl.size(); i++) {
+        idCollection.push_back(idColl[i]);
+    }
+
 }
 
 Type::~Type()
