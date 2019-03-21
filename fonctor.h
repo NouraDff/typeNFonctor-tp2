@@ -8,6 +8,18 @@ class Fonctor
     vector<string> typeCollection;
     vector<vector<string>> matrice;
     friend ostream &operator<<(ostream &os, const Fonctor &fct);
+    Fonctor operator=(const Fonctor &autre)
+    {
+        if (this == &autre)
+        {
+            return *this;
+        }
+
+        identificateur = autre.identificateur;
+        typeCollection = autre.typeCollection;
+        matrice = autre.matrice;
+        return *this;
+    }
 
     Fonctor();
     Fonctor(string id, vector<string> typeCollection, vector<vector<string>> matrice);
@@ -45,6 +57,7 @@ bool operator<(Fonctor const &left, Fonctor const &right)
     }
     return false;
 }
+
 bool operator>(Fonctor const &left, Fonctor const &right)
 {
     if (left.identificateur > right.identificateur)
@@ -61,7 +74,7 @@ ostream &operator<<(ostream &os, const Fonctor &fonctor)
         os << "(" << fonctor.matrice[i][0];
         for (int j = 1; j < fonctor.matrice[i].size(); j++)
         {
-            os << ", " <<fonctor.matrice[i][j] ;
+            os << ", " << fonctor.matrice[i][j];
         }
         os << ")" << endl;
     }
