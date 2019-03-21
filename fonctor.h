@@ -5,11 +5,10 @@ class Fonctor
 {
   public:
     string identificateur;
-    vector<string> typeCollection;
-    vector<vector<char*>> matrice;
+    vector<char*> typeCollection;
+    vector<vector<const char*>> matrice;
     friend ostream &operator<<(ostream &os, const Fonctor &fct);
-    Fonctor operator=(const Fonctor &autre)
-    {
+    Fonctor operator=(const Fonctor &autre){
         if (this == &autre)
         {
             return *this;
@@ -33,6 +32,7 @@ class Fonctor
         {
             typeCollection.push_back(fonctor.typeCollection[i]);
         }
+        matrice = fonctor.matrice; 
     }
 };
 
@@ -65,14 +65,16 @@ bool operator>(Fonctor const &left, Fonctor const &right)
     return false;
 }
 
+ 
+
 ostream &operator<<(ostream &os, const Fonctor &fonctor)
-{
+{ 
     for (int i = 0; i < fonctor.matrice.size(); i++)
     {
-        os << "(" << fonctor.matrice[i][0];
+        os << "(" << string(fonctor.matrice[i][0]);
         for (int j = 1; j < fonctor.matrice[i].size(); j++)
         {
-            os << ", " << fonctor.matrice[i][j];
+            os << ", " << string(fonctor.matrice[i][j]);
         }
         os << ")" << endl;
     }

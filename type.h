@@ -5,7 +5,7 @@ class Type
 {
 public:
     string identificateur; 
-    vector<char*> idCollection; 
+    vector<const char*> idCollection; 
     friend ostream &operator<<(ostream &os, const Type &type);
     Type operator=(const Type &autre)
     {
