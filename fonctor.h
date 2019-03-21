@@ -10,7 +10,7 @@ class Fonctor
     friend ostream &operator<<(ostream &os, const Fonctor &fct);
 
     Fonctor();
-    Fonctor(string id, vector<string> typeCollection, vector<vector<string>> matrice);
+    Fonctor(string id);
     ~Fonctor();
 
     //Constructeur par copie
@@ -24,11 +24,9 @@ class Fonctor
     }
 };
 
-Fonctor::Fonctor(string id, vector<string> typeColl, vector<vector<string>> matrix)
+Fonctor::Fonctor(string id)
 {
     identificateur = id;
-    typeCollection = typeColl;
-    matrice = matrix;
 }
 
 Fonctor::~Fonctor()
