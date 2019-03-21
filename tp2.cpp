@@ -11,6 +11,7 @@
 
 using namespace std;
 
+
 int main(int argc, const char **argv)
 {
 	ifstream fichier(argv[1], ios::in);
@@ -25,7 +26,7 @@ int main(int argc, const char **argv)
 		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;
 		Fonctor *tempF;
-		vector<char *> typ, clause;
+		vector< const char *>  clause, typ;
 		string entree, nom, str;
 
 		while (fichier >> entree >> nom)
@@ -68,7 +69,7 @@ int main(int argc, const char **argv)
 					else
 						typ.pop_back();
 
-					vector<vector<char *>> fonc;
+					vector<vector<const char *>> fonc;
 					char *ligne;
 					while (fichier.peek() == '(')
 					{
@@ -112,6 +113,12 @@ int main(int argc, const char **argv)
 		cerr << "Impossible d'ouvrir le fichier." << endl;
 	}
 
+	/*--------------------------------------------------------
+	 *
+	 * Lecture Clavier
+	 * 
+	 * -------------------------------------------------------*/ 
+
 	string input;
 	while (getline(cin, input) && !cin.eof())
 	{
@@ -131,12 +138,10 @@ int main(int argc, const char **argv)
 
 				if (arbreF->contient(*fonctor))
 				{
-					cout << "TROUVER" << endl;
 					cout << arbreF->rechercheElement(*fonctor) << endl;
 				}
 				else if (arbreT->contient(*type))
 				{
-
 					cout << arbreT->rechercheElement(*type) << endl;
 				}
 				else
