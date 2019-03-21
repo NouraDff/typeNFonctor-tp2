@@ -1,7 +1,8 @@
 # Makefile
 
 CARGS= -lm -std=c++11 -g
-.PHONY: all default testavl clean
+DATE = $(shell date +Modif:\ %a\ %-d\ %b\ %Y\ à\ %T)
+.PHONY: all default testavl clean save
 
 all : testavl tp2 
 
@@ -15,6 +16,8 @@ test: testavl.cpp arbreavl.h
 clean :
 	@rm -f testavl a.out
 
-	
+save:
+	@git commit -q -am "$(DATE)"	
+
 
 
