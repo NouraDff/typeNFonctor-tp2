@@ -20,7 +20,7 @@ int main(int argc, const char **argv)
 	if (fichier)
 	{
 
-		vector<char *> t, c;
+		vector<char *> typ, clause;
 		string entree, nom, str;
 
 		while (fichier >> entree >> nom)
@@ -34,7 +34,7 @@ int main(int argc, const char **argv)
 				strcpy(typ, str.c_str());
 
 				t.push_back(strtok(typ, "= {,"));
-				while (t.back() != NULL && find(t.begin(), t.end(), t.back()) == t.end() - 1) // lettres min
+				while (typ.back() != NULL && find(typ.begin(), t.end(), t.back()) == t.end() - 1) // lettres min
 					t.push_back(strtok(NULL, " ,}"));
 				if (t.back() != NULL && find(t.begin(), t.end(), t.back()) != t.end() - 1)
 					cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
