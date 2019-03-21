@@ -5,11 +5,23 @@ class Type
 {
 public:
     string identificateur; 
-    vector<string> idCollection; 
+    vector<char*> idCollection; 
+
     friend ostream &operator<<(ostream &os, const Type &type);
+    Type operator=(const Type &autre)
+    {
+        if (this == &autre)
+        {
+            return *this;
+        }
+
+        identificateur = autre.identificateur;
+        idCollection = autre.idCollection;
+        return *this;
+    }
 
     Type();
-    Type(string id, vector<string> idColl);
+    Type(string id);
     ~Type();
      //Constructeur par copie
     Type(const Type &type)
@@ -22,13 +34,9 @@ public:
     }
 };
 
-Type::Type(string id, vector<string> idColl)
+Type::Type(string id)
 {
     identificateur = id; 
-    for (int i=0; i<idColl.size(); i++) {
-        idCollection.push_back(idColl[i]);
-    }
-
 }
 
 Type::~Type()

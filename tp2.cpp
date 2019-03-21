@@ -4,120 +4,152 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <string>
+#include <string.h>
 #include "arbreavl.h"
 #include "type.h"
 #include "fonctor.h"
 
 using namespace std;
 
-int main(int argc, const char** argv){    
-    ifstream fichier(argv[1], ios::in); 
+int main(int argc, const char **argv)
+{
+	ifstream fichier(argv[1], ios::in);
 
-    if(fichier){
+	ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
+	ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 
-	vector<char*> t, c;
-	string entree, nom, str;
+	if (fichier)
+	{
 
-	while(fichier >> entree >> nom){	// être sûr que tt est en lettres min!! (caract par caract: isalpha(car) && islower(car)
-cout << entree << "->" << nom << endl;
-		if(!entree.compare("type")){
-		//treeType.rechercher(<"nom">); veut voir s'il existe avant de l'ajouter...
-                	getline(fichier, str);
-			char* typ = new char[str.length()+1];
-                        strcpy(typ, str.c_str());
+		ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
+		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
+		Type *tempT;
+		Fonctor *tempF;
+		vector<char *> typ, clause;
+		string entree, nom, str;
 
-                        t.push_back(strtok(typ, "= {,"));
-                        while(t.back() != NULL && find(t.begin(), t.end(), t.back())==t.end()-1) // lettres min
-                                t.push_back(strtok(NULL, " ,}"));
-			if(t.back()!=NULL && find(t.begin(), t.end(), t.back())!=t.end()-1)
-				cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-			else t.pop_back();
+		while (fichier >> entree >> nom)
+		{ // être sûr que tt est en lettres min!! (caract par caract: isalpha(car) && islower(car)
+			cout << entree << "->" << nom << endl;
+			tempT = new Type(nom);
+			tempF = new Fonctor(nom);
+			if (!arbreT->contient(*tempT) && !arbreF->contient(*tempF))
+			{
+				if (!entree.compare("type"))
+				{
 
-			for(unsigned it = 0 ; it < t.size(); ++it)
-                                cout << t.at(it) << endl;
-			// créer objet
-		}else if(!entree.compare("foncteur")){
-		//treeFonctor.rechercher(<"nom">); veut voir s'il existe avant de l'ajouter...
-                        getline(fichier, str);	
-			char* typ = new char[str.length()+1];
-			strcpy(typ, str.c_str()); 
+					getline(fichier, str);
+					char *arguments = new char[str.length() + 1];
+					strcpy(arguments, str.c_str());
 
-			t.push_back(strtok(typ, ": ,"));
-			while(t.back() != NULL && find(t.begin(), t.end(), t.back())==t.end()-1 /*&& t.back() est dans l'arbre de type*/) // lettres min
-				t.push_back(strtok(NULL, " ,"));
-			if(t.back()!=NULL && find(t.begin(), t.end(), t.back())!=t.end()-1)
-                                cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-			else t.pop_back();
+					typ.push_back(strtok(arguments, "= {,"));
+					while (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) == typ.end() - 1) // lettres min
+						typ.push_back(strtok(NULL, " ,}"));
+					if (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) != typ.end() - 1)
+						cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
+					else
+						typ.pop_back();
 
-			for(unsigned it = 0 ; it < t.size(); ++it)
-                                cout << t.at(it) << endl;
+					tempT->idCollection = typ;
+					arbreT->inserer(*tempT);
+				}
+				else if (!entree.compare("foncteur"))
+				{
 
-			vector<vector<char*>> f;
-			char* fonc;
-			while(fichier.peek() == '('){
-				getline(fichier, str);
-				fonc = new char[str.length()+1];
-				strcpy(fonc, str.c_str());
+					getline(fichier, str);
+					char *types = new char[str.length() + 1];
+					strcpy(types, str.c_str());
 
-				c.push_back(strtok(fonc, "( ,"));
-				int i = 0;
-				while(c.back() != NULL && find(c.begin(), c.end(), c.back())==c.end()-1 /*&& c.back() est un arg de t.at(i++)*/) // lettres min
-                                	c.push_back(strtok(NULL, " ,)"));
-				if(c.back()!=NULL && find(c.begin(), c.end(), c.back())!=c.end()-1)
-                                	cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-				else c.pop_back();
+					typ.push_back(strtok(types, ": ,"));
+					while (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) == typ.end() - 1 /*&& t.back() est dans l'arbre de type*/) // lettres min
+						typ.push_back(strtok(NULL, " ,"));
+					if (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) != typ.end() - 1)
+						cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
+					else
+						typ.pop_back();
 
-				for(unsigned it = 0 ; it < c.size(); ++it)
-                                	cout << c.at(it) << endl;
+					vector<vector<char *>> fonc;
+					char *ligne;
+					while (fichier.peek() == '(')
+					{
+						getline(fichier, str);
+						ligne = new char[str.length() + 1];
+						strcpy(ligne, str.c_str());
 
-				f.push_back(c);
-				c.clear();
-				c.shrink_to_fit();
-			}
-			// créer obj
-			f.clear();
-			f.shrink_to_fit();
-		}else{
-			cerr << "Entrée invalide." << endl; // arrêt??
+						clause.push_back(strtok(ligne, "( ,"));
+						int i = 0;
+						while (clause.back() != NULL && find(clause.begin(), clause.end(), clause.back()) == clause.end() - 1 /*&& c.back() est un arg de t.at(i++)*/) // lettres min
+							clause.push_back(strtok(NULL, " ,)"));
+						if (clause.back() != NULL && find(clause.begin(), clause.end(), clause.back()) != clause.end() - 1)
+							cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
+						else
+							clause.pop_back();
+
+						fonc.push_back(clause);
+						clause.clear();
+						clause.shrink_to_fit();
+					}
+
+					tempF->matrice = fonc;
+					arbreF->inserer(*tempF);
+					fonc.clear();
+					fonc.shrink_to_fit();
+				}
+				else
+				{
+					cerr << "Entrée invalide." << endl; // arrêt??
+				}
+				typ.clear();
+				typ.shrink_to_fit();
+			} //else objet de même nom existe déjà
 		}
-		t.clear();
-		t.shrink_to_fit();
+
+		fichier.close();
 	}
 
-        fichier.close(); 
-    }
-    else{
-        cerr << "Impossible d'ouvrir le fichier." << endl; 
-    }
+	else
+	{
+		cerr << "Impossible d'ouvrir le fichier." << endl;
+	}
 
-    // vector<string> boole;
-    // boole.push_back("vrai"); 
-    // boole.push_back("faux"); 
+	string input;
+	while (getline(cin, input) && !cin.eof())
+	{
+		vector<string> vec;
+		//mettre chaque élément dans un vector)
+		vec.push_back(input);
+		size_t found = input.find_first_of("?(");
+		//Si la position du caractère doit ce trouver dans la chaine de catactère
+		if (found < input.length() && found > 0)
+		{
+			//Coupe la chaine au ?
+			string identificateur = input.substr(0, found);
+			Fonctor *fonctor = new Fonctor(identificateur);
+			Type *type = new Type(identificateur);
+			if (input.at(found) == '?')
+			{
 
-    //  vector<vector<string> > fct { { "vrai", "vrai", "vrai" }, 
-    //                            { "faux", "faux", "faux" }, 
-    //                            { "vrai", "faux", "vrai" } }; 
-    
-    // Fonctor *fonctor = new Fonctor("Boolean", boole, fct); 
+				if (arbreF->contient(*fonctor))
+				{
+					cout << "TROUVER" << endl;
+					cout << arbreF->rechercheElement(*fonctor) << endl;
+				}
+				else if (arbreT->contient(*type))
+				{
 
-    //  ArbreAVL<Fonctor> *tree = new ArbreAVL<Fonctor>(); 
-    //  tree->inserer(*fonctor); 
-    //  cout << *fonctor << endl;
-
-
-    // Type *type= new Type("Toto", boole); 
-
-    // ArbreAVL<Type> *tree1 = new ArbreAVL<Type>(); 
-
-    // tree1->inserer(*type); 
-
-
-    // if(tree1->contient (*type)){
-    //    Type trouve = tree1->rechercheElement(*type); 
-    //     cout << trouve << endl; 
-    // }
+					cout << arbreT->rechercheElement(*type) << endl;
+				}
+				else
+				{
+					cout << "PAS TROUVER" << endl;
+				}
+			}
+			else if (input.at(found) == '(')
+			{
+				cout << "Requete ()" << endl;
+			}
+		}
+	}
 
 	return 0;
 }
-   
