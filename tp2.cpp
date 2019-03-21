@@ -64,7 +64,7 @@ cout << entree << "->" << nom << endl;
 					ligne = new char[str.length()+1];
 					strcpy(ligne, str.c_str());
 
-					c.push_back(strtok(ligne, "( ,"));
+					clause.push_back(strtok(ligne, "( ,"));
 					int i = 0;
 					while(clause.back() != NULL && find(clause.begin(), clause.end(), clause.back())==clause.end()-1 /*&& c.back() est un arg de t.at(i++)*/) // lettres min
                                 		clause.push_back(strtok(NULL, " ,)"));
