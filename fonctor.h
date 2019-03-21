@@ -5,7 +5,7 @@ class Fonctor
 {
   public:
     string identificateur;
-    vector<char*> typeCollection;
+    vector<const char*> typeCollection;
     vector<vector<const char*>> matrice;
     friend ostream &operator<<(ostream &os, const Fonctor &fct);
     Fonctor operator=(const Fonctor &autre){

@@ -119,6 +119,7 @@ int main(int argc, const char **argv)
 	 * 
 	 * -------------------------------------------------------*/ 
 
+
 	string input;
 	while (getline(cin, input) && !cin.eof())
 	{
