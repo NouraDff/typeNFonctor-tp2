@@ -22,7 +22,7 @@ class Fonctor
     }
 
     Fonctor();
-    Fonctor(string id);
+    Fonctor(string id, vector<string> typeCollection, vector<vector<string>> matrice);
     ~Fonctor();
 
     //Constructeur par copie
@@ -36,9 +36,11 @@ class Fonctor
     }
 };
 
-Fonctor::Fonctor(string id)
+Fonctor::Fonctor(string id, vector<string> typeColl, vector<vector<string>> matrix)
 {
     identificateur = id;
+    typeCollection = typeColl;
+    matrice = matrix;
 }
 
 Fonctor::~Fonctor()
