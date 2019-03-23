@@ -73,9 +73,9 @@ int main(int argc, const char** argv){
                                         strcpy(ligne, str.c_str());
 
                                         clause.push_back(strtok(ligne, "( ,")); // vérifier que logueur de clause est tjr = longueur type (si + grand => erreur, peut pas chercher)
-                                        while(clause.back()!=NULL&&find(type.at[clause.end()]->idCollection.begin(), type.at[clause.end()]->idCollection.end(), clause.back())==clause.end()-1)
+                                        while(clause.back()!=NULL&&find(type.at(clause.size())->idCollection.begin(), type.at(clause.size())->idCollection.end(), clause.back())==clause.end()-1)
                                                 clause.push_back(strtok(NULL, " ,)"));
-                                        if(clause.back()!=NULL && find(type.at[clause.end()]->idCollection.begin(), type.at[clause.end()]->idCollection.end(), clause.back())!=clause.end()-1)
+                                        if(clause.back()!=NULL && find(type.at(clause.size())->idCollection.begin(), type.at(clause.size())->idCollection.end(), clause.back())!=clause.end()-1)
                                                 cerr << "Les clauses ne sont pas toutes valides." << endl; // arrêt??
                                         else clause.pop_back();
 

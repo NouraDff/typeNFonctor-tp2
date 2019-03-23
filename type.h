@@ -10,6 +10,8 @@ public:
 	// Opérateurs:
 	bool operator<(Type const& droit) const;
 	bool operator>(Type const& droit) const;
+	bool operator==(Type const& droit) const;
+	bool operator!=(Type const& droit) const;
 	Type &operator=(const Type& autre);
     	friend ostream &operator<<(ostream &os, const Type &type);
 
@@ -50,6 +52,20 @@ bool Type::operator>(Type const& droit) const
         return true;
     }   
     return false; 
+}
+
+bool Type::operator==(Type const& droit) const
+{
+	if(identificateur == droit.identificateur)
+		return true;
+	return false;
+}
+
+bool Type::operator!=(Type const& droit) const
+{
+	if(identificateur != droit.identificateur)
+		return true;
+	return false;
 }
 
 Type &Type::operator=(const Type& autre)
