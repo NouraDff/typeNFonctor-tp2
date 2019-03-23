@@ -20,7 +20,7 @@ int main(int argc, const char** argv){
 	ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 	Type *tempT;
 	Fonctor *tempF, *ftemp;
-	vector<char*> typ, clause;
+	vector<const char*> typ, clause;
 	string entree, nom, str;
 
 	while(fichier >> entree >> nom){	// nom doit être lettres (caract par caract: isalpha(car) 
@@ -52,7 +52,7 @@ int main(int argc, const char** argv){
 				typ.push_back(strtok(types, ": ,")); // vecteur de types
 				while(typ.back() != NULL){ 
 					tempT = new Type(typ.back());
-					if(arbreT->contient(tempT))
+					if(arbreT->contient(*tempT))
 						typ.push_back(strtok(NULL, " ,"));
  					else
                                                 cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
@@ -60,7 +60,7 @@ int main(int argc, const char** argv){
                                 if(typ.back()==NULL)
                                         typ.pop_back();
 
-                                vector<vector<char*>> fonc;
+                                vector<vector<const char*>> fonc;
                                 char* ligne;
                                 while(fichier.peek() == '('){
                                         getline(fichier, str);
@@ -71,7 +71,7 @@ int main(int argc, const char** argv){
                                         int i = 0;
                                         while(clause.back() != NULL /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())==clause.end()-1*/)
                                                 clause.push_back(strtok(NULL, " ,)"));
-                                        if(clause.back()!=NULL && /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())!=clause.end()-1*/)
+                                        if(clause.back()!=NULL /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())!=clause.end()-1*/)
                                                 cerr << "Les clauses ne sont pas toutes valides." << endl; // arrêt??
                                         else clause.pop_back();
 
