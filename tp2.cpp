@@ -14,7 +14,7 @@ using namespace std;
 int main(int argc, const char** argv){    
     ifstream fichier(argv[1], ios::in); 
 
-    if(fichier){ //récup de données non poussées
+    if(fichier){ 
 
 	ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
 	ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
@@ -54,50 +54,95 @@ int main(int argc, const char** argv){
 					tempT = new Type(typ.back());
 					if(arbreT->contient(tempT))
 						typ.push_back(strtok(NULL, " ,"));
+ 					else
+                                                cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
+                                }
+                                if(typ.back()==NULL)
+                                        typ.pop_back();
+
+                                vector<vector<char*>> fonc;
+                                char* ligne;
+                                while(fichier.peek() == '('){
+                                        getline(fichier, str);
+                                        ligne = new char[str.length()+1];
+                                        strcpy(ligne, str.c_str());
+
+                                        clause.push_back(strtok(ligne, "( ,"));
+                                        int i = 0;
+                                        while(clause.back() != NULL /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())==clause.end()-1*/)
+                                                clause.push_back(strtok(NULL, " ,)"));
+                                        if(clause.back()!=NULL && /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())!=clause.end()-1*/)
+                                                cerr << "Les clauses ne sont pas toutes valides." << endl; // arrêt??
+                                        else clause.pop_back();
+
+                                        fonc.push_back(clause);
+                                        clause.clear();
+                                        clause.shrink_to_fit();
+                                }
+
+                                tempF->matrice = fonc;
+                                arbreF->inserer(*tempF);
+                                fonc.clear();
+                                fonc.shrink_to_fit();
+				}
+				else
+				{
+					cerr << "Entrée invalide." << endl; // arrêt??
+				}
+				typ.clear();
+				typ.shrink_to_fit();
+			} //else objet de même nom existe déjà
+		}
+
+		fichier.close();
+
+		/*--------------------------------------------------------
+	 	*
+	 	* Lecture Clavier
+	 	* 
+	 	* -------------------------------------------------------*/ 
+
+
+		string input;
+		while (getline(cin, input) && !cin.eof())
+		{
+			vector<string> vec;
+			//mettre chaque élément dans un vector)
+			vec.push_back(input);
+			size_t found = input.find_first_of("?(");
+			//Si la position du caractère doit ce trouver dans la chaine de catactère
+			if (found < input.length() && found > 0)
+			{
+				//Coupe la chaine au ?
+				string identificateur = input.substr(0, found);
+				Fonctor *fonctor = new Fonctor(identificateur);
+				Type *type = new Type(identificateur);
+				if (input.at(found) == '?')
+				{
+					if (arbreF->contient(*fonctor))
+					{
+						cout << arbreF->rechercheElement(*fonctor) << endl;
+					}
+					else if (arbreT->contient(*type))
+					{
+						cout << arbreT->rechercheElement(*type) << endl;
+					}
 					else
-						cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
+					{
+						cout << "PAS TROUVER" << endl;
+					}
 				}
-				if(typ.back()==NULL)
-                                	typ.pop_back();
-
-				vector<vector<char*>> fonc;
-				char* ligne;
-				while(fichier.peek() == '('){
-					getline(fichier, str);
-					ligne = new char[str.length()+1];
-					strcpy(ligne, str.c_str());
-
-					clause.push_back(strtok(ligne, "( ,"));
-					int i = 0;
-					while(clause.back() != NULL /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())==clause.end()-1*/)
-                                		clause.push_back(strtok(NULL, " ,)"));
-					if(clause.back()!=NULL && /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())!=clause.end()-1*/)
-                                		cerr << "Les clauses ne sont pas toutes valides." << endl; // arrêt??
-					else clause.pop_back();
-
-					fonc.push_back(clause);
-					clause.clear();
-					clause.shrink_to_fit();
+				else if (input.at(found) == '(')
+				{
+					cout << "Requete ()" << endl;
 				}
-			
-				tempF->matrice = fonc;
-				arbreF->inserer(*tempF);
-				fonc.clear();
-				fonc.shrink_to_fit();
-
-			}else{
-				cerr << "Entrée invalide." << endl; // arrêt??
 			}
-			typ.clear();
-			typ.shrink_to_fit();
-		}//else objet de même nom existe déjà
+		}
 	}
-
-        fichier.close(); 
-    }
-    else{
-        cerr << "Impossible d'ouvrir le fichier." << endl; 
-    }
+	else
+        {
+                cerr << "Impossible d'ouvrir le fichier." << endl;
+        }
 
 	return 0;
 }

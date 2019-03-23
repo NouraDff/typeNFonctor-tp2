@@ -5,33 +5,26 @@ class Type
 {
 public:
     string identificateur; 
-    vector<char*> idCollection; 
-    friend ostream &operator<<(ostream &os, const Type &type);
-    Type operator=(const Type &autre)
-    {
-        if (this == &autre)
-        {
-            return *this;
-        }
+    vector<const char*> idCollection; 
 
-        identificateur = autre.identificateur;
-        idCollection = autre.idCollection;
-        return *this;
-    }
+	// Opérateurs:
+	bool operator<(Type const& droit) const;
+	bool operator>(Type const& droit) const;
+	Type &operator=(const Type& autre);
+    	friend ostream &operator<<(ostream &os, const Type &type);
 
     Type();
     Type(string id);
     ~Type();
-     //Constructeur par copie
-    Type(const Type &type)
-    {
-        identificateur = type.identificateur;
-         for (int i=0; i<type.idCollection.size(); i++) {
-            idCollection.push_back(type.idCollection[i]); 
-         }
-      
-    }
+
+	private:
+		void afficher(ostream &os) const;
 };
+
+Type::Type()
+        : identificateur(NULL), idCollection(0)
+{
+}
 
 Type::Type(string id)
 {
@@ -43,30 +36,44 @@ Type::~Type()
     idCollection.clear(); 
 }
 
-
-   bool operator< (Type const& left, Type const& right) {
-    if(left.identificateur < right.identificateur){
-        return true;
-    }   
-    return false; 
-}
- bool operator > (Type const& left, Type const& right) {
-    if(left.identificateur > right.identificateur){
-        return true;
-    }   
-    return false; 
-}
-
-ostream &operator<<(ostream &os, const Type &type)
+bool Type::operator<(Type const& droit) const
 {
-    os << "{" <<  type.idCollection.at(0);
-    for (int i = 1; i < type.idCollection.size(); i++) {
-		os << ", " << type.idCollection.at(i);
+    if(identificateur < droit.identificateur){
+        return true;
+    }   
+    return false; 
+}
+
+bool Type::operator>(Type const& droit) const 
+{
+    if(identificateur > droit.identificateur){
+        return true;
+    }   
+    return false; 
+}
+
+Type &Type::operator=(const Type& autre)
+{
+        if (this == &autre)
+        {
+            return *this;
+        }
+        identificateur = autre.identificateur;
+        idCollection = autre.idCollection;
+        return *this;
+}
+
+ostream &operator<<(ostream &os, const Type& type)
+{
+        type.afficher(os);
+    return os;
+}
+
+void Type::afficher(ostream &os) const
+{
+    os << "{" <<  idCollection.at(0);
+    for (int i = 1; i < idCollection.size(); i++) {
+		os << ", " << idCollection.at(i);
 	}
     os << "}" << endl; 
-    
-   
 }
-
-
-
