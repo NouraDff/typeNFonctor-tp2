@@ -11,17 +11,12 @@
 
 using namespace std;
 
-
 int main(int argc, const char **argv)
 {
 	ifstream fichier(argv[1], ios::in);
 
-	ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
-	ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
-
 	if (fichier)
 	{
-
 		ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
 		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;

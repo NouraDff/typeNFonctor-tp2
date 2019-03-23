@@ -5,36 +5,26 @@ class Fonctor
 {
   public:
     string identificateur;
-    vector<const char*> typeCollection;
     vector<vector<const char*>> matrice;
-    friend ostream &operator<<(ostream &os, const Fonctor &fct);
-    Fonctor operator=(const Fonctor &autre){
-        if (this == &autre)
-        {
-            return *this;
-        }
 
-        identificateur = autre.identificateur;
-        typeCollection = autre.typeCollection;
-        matrice = autre.matrice;
-        return *this;
-    }
+  // Opérateurs
+    bool operator>(Fonctor const &droit) const;
+    bool operator<(Fonctor const &droit) const;
+    Fonctor &operator=(const Fonctor& autre);
+    friend ostream &operator<<(ostream &os, const Fonctor& fonctor);
 
     Fonctor();
     Fonctor(string id);
     ~Fonctor();
 
-    //Constructeur par copie
-    Fonctor(const Fonctor &fonctor)
-    {
-        identificateur = fonctor.identificateur;
-        for (int i = 0; i < fonctor.typeCollection.size(); i++)
-        {
-            typeCollection.push_back(fonctor.typeCollection[i]);
-        }
-        matrice = fonctor.matrice; 
-    }
+  private:
+    void afficher(ostream &os) const;
 };
+
+Fonctor::Fonctor()
+	: identificateur(NULL), matrice(0)
+{
+}
 
 Fonctor::Fonctor(string id)
 {
@@ -43,38 +33,52 @@ Fonctor::Fonctor(string id)
 
 Fonctor::~Fonctor()
 {
-    typeCollection.clear();
     matrice.clear();
 }
 
-bool operator<(Fonctor const &left, Fonctor const &right)
+bool Fonctor::operator<(Fonctor const &droit) const
 {
-    if (left.identificateur < right.identificateur)
+    if (identificateur < droit.identificateur)
     {
         return true;
     }
     return false;
 }
 
-bool operator>(Fonctor const &left, Fonctor const &right)
+bool Fonctor::operator>(Fonctor const &droit) const
 {
-    if (left.identificateur > right.identificateur)
+    if (identificateur > droit.identificateur)
     {
         return true;
     }
     return false;
 }
 
- 
-
-ostream &operator<<(ostream &os, const Fonctor &fonctor)
-{ 
-    for (int i = 0; i < fonctor.matrice.size(); i++)
-    {
-        os << "(" << string(fonctor.matrice[i][0]);
-        for (int j = 1; j < fonctor.matrice[i].size(); j++)
+Fonctor &Fonctor::operator=(const Fonctor& autre)
+{
+	if (this == &autre)
         {
-            os << ", " << string(fonctor.matrice[i][j]);
+            return *this;
+        }
+	identificateur = autre.identificateur;
+	matrice = autre.matrice;
+	return *this;
+} 
+
+ostream &operator<<(ostream &os, const Fonctor& fonctor)
+{ 
+	fonctor.afficher(os);
+    return os;
+}
+
+void Fonctor::afficher(ostream &os) const
+{
+    for (int i = 0; i < matrice.size(); i++)
+    {
+        os << "(" << string(matrice[i][0]);
+        for (int j = 1; j < matrice[i].size(); j++)
+        {
+            os << ", " << string(matrice[i][j]);
         }
         os << ")" << endl;
     }
