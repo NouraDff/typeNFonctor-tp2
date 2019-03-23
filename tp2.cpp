@@ -19,9 +19,12 @@ int main(int argc, const char** argv){
 	ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
 	ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 	Type *tempT;
-	Fonctor *tempF, *ftemp;
-	vector<const char*> typ, clause;
+	Fonctor *tempF;
+	vector<const char*> arguments, clause;
+	vector<const Type*> type;
+	vector<vector<const char*>> fonc;
 	string entree, nom, str;
+	char* ligne; // voir si on peut éviter la conversion char*/string
 
 	while(fichier >> entree >> nom){	// nom doit être lettres (caract par caract: isalpha(car) 
 		tempT = new Type(nom);
@@ -30,48 +33,49 @@ int main(int argc, const char** argv){
 			if(!entree.compare("type")){
 
                 		getline(fichier, str);
-				char* arguments = new char[str.length()+1];
-                        	strcpy(arguments, str.c_str());
+				ligne = new char[str.length()+1];
+                        	strcpy(ligne, str.c_str());
 
-                        	typ.push_back(strtok(arguments, "= {,"));
-                        	while(typ.back() != NULL && find(typ.begin(), typ.end(), typ.back())==typ.end()-1) // lettres 
-                                	typ.push_back(strtok(NULL, " ,}"));
-				if(typ.back()!=NULL && find(typ.begin(), typ.end(), typ.back())!=typ.end()-1)
+                        	arguments.push_back(strtok(ligne, "= {,"));
+                        	while(arguments.back() != NULL && find(arguments.begin(), arguments.end(), arguments.back())==arguments.end()-1) // lettres 
+                                	arguments.push_back(strtok(NULL, " ,}"));
+				if(arguments.back()!=NULL && find(arguments.begin(), arguments.end(), arguments.back())!=arguments.end()-1)
 					cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-				else typ.pop_back();
+				else arguments.pop_back();
 
-				tempT->idCollection = typ;
+				tempT->idCollection = arguments;
 				arbreT->inserer(*tempT);
+				arguments.clear();
+				arguments.shrink_to_fit();
 
 			}else if(!entree.compare("foncteur")){
 
                         	getline(fichier, str);	
-				char* types = new char[str.length()+1];
-				strcpy(types, str.c_str()); 
+				ligne = new char[str.length()+1];
+				strcpy(ligne, str.c_str()); 
 
-				typ.push_back(strtok(types, ": ,")); // vecteur de types
-				while(typ.back() != NULL){ 
-					tempT = new Type(typ.back());
-					if(arbreT->contient(*tempT))
-						typ.push_back(strtok(NULL, " ,"));
+				tempT = new Type(strtok(ligne, ": ,"));
+				type.push_back(tempT); 
+				while(tempT->identificateur != NULL){ 
+					if(arbreT->contient(*tempT)){
+						tempT = new Type(strtok(ligne, ": ,"));
+						type.push_back(tempT);
+					}
  					else
                                                 cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
                                 }
-                                if(typ.back()==NULL)
-                                        typ.pop_back();
+                                if(tempT->identificateur==NULL) // ajouter surcharge de == et != dans type
+                                        type.pop_back();
 
-                                vector<vector<const char*>> fonc;
-                                char* ligne;
                                 while(fichier.peek() == '('){
                                         getline(fichier, str);
                                         ligne = new char[str.length()+1];
                                         strcpy(ligne, str.c_str());
 
-                                        clause.push_back(strtok(ligne, "( ,"));
-                                        int i = 0;
-                                        while(clause.back() != NULL /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())==clause.end()-1*/)
+                                        clause.push_back(strtok(ligne, "( ,")); // vérifier que logueur de clause est tjr = longueur type (si + grand => erreur, peut pas chercher)
+                                        while(clause.back()!=NULL&&find(type.at[clause.end()]->idCollection.begin(), type.at[clause.end()]->idCollection.end(), clause.back())==clause.end()-1)
                                                 clause.push_back(strtok(NULL, " ,)"));
-                                        if(clause.back()!=NULL /*find(vecT.at[i].idCollection.begin(), vecT.at[i].idCollection.end(), clause.back())!=clause.end()-1*/)
+                                        if(clause.back()!=NULL && find(type.at[clause.end()]->idCollection.begin(), type.at[clause.end()]->idCollection.end(), clause.back())!=clause.end()-1)
                                                 cerr << "Les clauses ne sont pas toutes valides." << endl; // arrêt??
                                         else clause.pop_back();
 
@@ -80,6 +84,8 @@ int main(int argc, const char** argv){
                                         clause.shrink_to_fit();
                                 }
 
+				type.clear();
+				type.shrink_to_fit();
                                 tempF->matrice = fonc;
                                 arbreF->inserer(*tempF);
                                 fonc.clear();
@@ -89,8 +95,6 @@ int main(int argc, const char** argv){
 				{
 					cerr << "Entrée invalide." << endl; // arrêt??
 				}
-				typ.clear();
-				typ.shrink_to_fit();
 			} //else objet de même nom existe déjà
 		}
 
