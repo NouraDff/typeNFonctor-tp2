@@ -10,14 +10,15 @@ public:
 	// Opérateurs:
 	bool operator<(Type const& droit) const;
 	bool operator>(Type const& droit) const;
-	bool operator==(Type const& droit) const;
-	bool operator!=(Type const& droit) const;
 	Type &operator=(const Type& autre);
     	friend ostream &operator<<(ostream &os, const Type &type);
 
     Type();
     Type(string id);
     ~Type();
+
+	bool existe() const;
+	bool possede(const char* argument) const;
 
 	private:
 		void afficher(ostream &os) const;
@@ -38,6 +39,20 @@ Type::~Type()
     idCollection.clear(); 
 }
 
+bool Type::existe() const
+{
+	if(identificateur == "")
+		return false;
+	return true;
+}
+
+bool Type::possede(const char* argument) const
+{
+	if(find(idCollection.begin(), idCollection.end(), argument)!=idCollection.end())
+		return true;
+	return false;
+}
+
 bool Type::operator<(Type const& droit) const
 {
     if(identificateur < droit.identificateur){
@@ -52,20 +67,6 @@ bool Type::operator>(Type const& droit) const
         return true;
     }   
     return false; 
-}
-
-bool Type::operator==(Type const& droit) const
-{
-	if(identificateur == droit.identificateur)
-		return true;
-	return false;
-}
-
-bool Type::operator!=(Type const& droit) const
-{
-	if(identificateur != droit.identificateur)
-		return true;
-	return false;
 }
 
 Type &Type::operator=(const Type& autre)
