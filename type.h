@@ -4,7 +4,7 @@ using namespace std;
 class Type
 {
 public:
-    string identificateur; 
+    const char* identificateur; 
     vector<const char*> idCollection; 
 
 	// Opérateurs:
@@ -14,7 +14,7 @@ public:
     	friend ostream &operator<<(ostream &os, const Type &type);
 
     Type();
-    Type(string id);
+    Type(const char* id);
     ~Type();
 
 	bool existe() const;
@@ -29,19 +29,19 @@ Type::Type()
 {
 }
 
-Type::Type(string id)
+Type::Type(const char* id)
 {
     identificateur = id; 
 }
 
 Type::~Type()
 {
-    idCollection.clear(); 
+    idCollection.clear(); //.shrink_to_fit ? et id = NULL?
 }
 
 bool Type::existe() const
 {
-	if(identificateur == "")
+	if(identificateur == NULL)
 		return false;
 	return true;
 }

@@ -12,13 +12,19 @@
 using namespace std;
 
 bool estEnLettres(const char* id){
-	for(unsigned i = 0; i < sizeof(id); ++i)
+	for(unsigned i = 0; i < strlen(id); ++i)
 		if(!isalpha(id[i]))
 			return false;
 	return true;
 }
 
-int main(int argc, const char** argv){    
+template <class T>
+void vider(vector<T> *vect){
+	vect->clear();
+	vect->shrink_to_fit();
+}
+
+int main(int argc, const char** argv){ // vérifier erreurs d'entrée (ne fonctionne plus correctement depuis nouvelles fct...) comme si les objets étaient ajoutés à l'arbre et non effacés après
     ifstream fichier(argv[1], ios::in); 
 
     if(fichier){ 
@@ -34,14 +40,14 @@ int main(int argc, const char** argv){
 
 	while(fichier >> entree >> nom){	
 
-		tempT = new Type(nom);
-                tempF = new Fonctor(nom);
+		tempT = new Type(nom.c_str());
+                tempF = new Fonctor(nom.c_str());
                 if(estEnLettres(nom.c_str()) && !arbreT->contient(*tempT) && !arbreF->contient(*tempF)){
 			if(!entree.compare("type")){
 
                 		getline(fichier, ligne);
                         	arguments.push_back(strtok((char*)ligne.c_str(), "= {,"));
-                        	while(arguments.back() != NULL && find(arguments.begin(), arguments.end(), arguments.back())==arguments.end()-1) 
+                        	while(arguments.back() != NULL && find(arguments.begin(), arguments.end(), arguments.back())==arguments.end()-1)
                                 	if(estEnLettres(arguments.back()))
 						arguments.push_back(strtok(NULL, " ,}"));
 					else
@@ -52,12 +58,11 @@ int main(int argc, const char** argv){
 
 				tempT->idCollection = arguments;
 				arbreT->inserer(*tempT);
-				arguments.clear();
-				arguments.shrink_to_fit();
+				vider(&arguments);
 
 			}else if(!entree.compare("foncteur")){
 
-                        	getline(fichier, ligne);	
+                        	getline(fichier, ligne);
 				tempT = new Type(strtok((char*)ligne.c_str(), ": ,"));
 				type.push_back(tempT); 
 				while(tempT->existe()){ 
@@ -84,25 +89,22 @@ int main(int argc, const char** argv){
 						cerr << "Le format des clauses est invalide." << endl; // arrêt??
 
                                         fonc.push_back(clause);
-                                        clause.clear();
-                                        clause.shrink_to_fit();
+                                        vider(&clause);
                                 }
 
-				type.clear();
-				type.shrink_to_fit();
+				vider(&type);
                                 tempF->matrice = fonc;
                                 arbreF->inserer(*tempF);
-                                fonc.clear();
-                                fonc.shrink_to_fit();
-				}
-				else
-				{
-					cerr << "Entrée invalide." << endl; // arrêt??
-				}
-			} //else objet de même nom existe déjà ou nom n'est pas alphabéthque
-		}
+                                vider(&fonc);
+			}
+			else
+			{
+				cerr << "Entrée invalide." << endl; // arrêt??
+			}
+		} //else objet de même nom existe déjà ou nom n'est pas alphabéthque
+	}
 
-		fichier.close();
+	fichier.close();
 
 		/*--------------------------------------------------------
 	 	*
@@ -123,8 +125,8 @@ int main(int argc, const char** argv){
 			{
 				//Coupe la chaine au ?
 				string identificateur = input.substr(0, found);
-				Fonctor *fonctor = new Fonctor(identificateur);
-				Type *type = new Type(identificateur);
+				Fonctor *fonctor = new Fonctor(identificateur.c_str());
+				Type *type = new Type(identificateur.c_str());
 				if (input.at(found) == '?')
 				{
 					if (arbreF->contient(*fonctor))
