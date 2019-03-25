@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 int main(int argc, const char **argv)
 {
 	ifstream fichier(argv[1], ios::in);
@@ -26,7 +25,7 @@ int main(int argc, const char **argv)
 		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;
 		Fonctor *tempF;
-		vector< const char *>  clause, typ;
+		vector<const char *> clause, typ;
 		string entree, nom, str;
 
 		while (fichier >> entree >> nom)
@@ -117,8 +116,7 @@ int main(int argc, const char **argv)
 	 *
 	 * Lecture Clavier
 	 * 
-	 * -------------------------------------------------------*/ 
-
+	 * -------------------------------------------------------*/
 
 	string input;
 	while (getline(cin, input) && !cin.eof())
@@ -153,6 +151,32 @@ int main(int argc, const char **argv)
 			else if (input.at(found) == '(')
 			{
 				cout << "Requete ()" << endl;
+				//Enlève la première parathèse
+				string elm = input.substr(found, input.find(')'));
+
+				//mettre chaque élément dans un vecteur
+				//puis trouver à quel index est le ?
+				//rechercher dans matrice ligne par ligne si ça correspond
+
+				vector<string> elmFonctor;				
+				size_t start = 0, end = 0;				
+				while ((end = input.find(',', start)) != string::npos)
+				{
+					if (end != start)
+					{
+						elmFonctor.push_back(input.substr(start, end - start));
+					}
+					start = end + 1;
+				}
+				if (end != start)
+				{
+					elmFonctor.push_back(input.substr(start));
+				}
+
+				for (int i = 1; i < elmFonctor.size(); i++)
+				{
+					cout << elmFonctor.at(i) << endl;
+				}
 			}
 		}
 	}
