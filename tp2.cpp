@@ -11,12 +11,24 @@
 
 using namespace std;
 
-int main(int argc, const char **argv)
+bool estEnLettres(const char *id)
 {
-	ifstream fichier(argv[1], ios::in);
+	for (unsigned i = 0; i < strlen(id); ++i)
+		if (!isalpha(id[i]))
+			return false;
+	return true;
+}
 
-	ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
-	ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
+template <class T>
+void vider(vector<T> *vect)
+{
+	vect->clear();
+	vect->shrink_to_fit();
+}
+
+int main(int argc, const char **argv)
+{ // vérifier erreurs d'entrée (ne fonctionne plus correctement depuis nouvelles fct...) comme si les objets étaient ajoutés à l'arbre et non effacés après
+	ifstream fichier(argv[1], ios::in);
 
 	if (fichier)
 	{
@@ -25,160 +37,158 @@ int main(int argc, const char **argv)
 		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;
 		Fonctor *tempF;
-		vector<const char *> clause, typ;
-		string entree, nom, str;
+		vector<const char *> arguments, clause;
+		vector<const Type *> type;
+		vector<vector<const char *>> fonc;
+		string entree, nom, ligne;
 
 		while (fichier >> entree >> nom)
-		{ // être sûr que tt est en lettres min!! (caract par caract: isalpha(car) && islower(car)
-			cout << entree << "->" << nom << endl;
-			tempT = new Type(nom);
-			tempF = new Fonctor(nom);
-			if (!arbreT->contient(*tempT) && !arbreF->contient(*tempF))
+		{
+
+			tempT = new Type(nom.c_str());
+			tempF = new Fonctor(nom.c_str());
+			if (estEnLettres(nom.c_str()) && !arbreT->contient(*tempT) && !arbreF->contient(*tempF))
 			{
 				if (!entree.compare("type"))
 				{
 
-					getline(fichier, str);
-					char *arguments = new char[str.length() + 1];
-					strcpy(arguments, str.c_str());
-
-					typ.push_back(strtok(arguments, "= {,"));
-					while (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) == typ.end() - 1) // lettres min
-						typ.push_back(strtok(NULL, " ,}"));
-					if (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) != typ.end() - 1)
+					getline(fichier, ligne);
+					arguments.push_back(strtok((char *)ligne.c_str(), "= {,"));
+					while (arguments.back() != NULL && find(arguments.begin(), arguments.end(), arguments.back()) == arguments.end() - 1)
+						if (estEnLettres(arguments.back()))
+							arguments.push_back(strtok(NULL, " ,}"));
+						else
+							cerr << "Les arguments ne contiennent pas uniquement que des lettres." << endl; // arrêt??
+					if (arguments.back() != NULL && find(arguments.begin(), arguments.end(), arguments.back()) != arguments.end() - 1)
 						cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
 					else
-						typ.pop_back();
+						arguments.pop_back();
 
-					tempT->idCollection = typ;
+					tempT->idCollection = arguments;
 					arbreT->inserer(*tempT);
+					vider(&arguments);
 				}
 				else if (!entree.compare("foncteur"))
 				{
 
-					getline(fichier, str);
-					char *types = new char[str.length() + 1];
-					strcpy(types, str.c_str());
+					getline(fichier, ligne);
+					tempT = new Type(strtok((char *)ligne.c_str(), ": ,"));
+					type.push_back(tempT);
+					while (tempT->existe())
+					{
+						if (arbreT->contient(*tempT))
+						{
+							tempT = new Type(strtok(NULL, " ,"));
+							type.push_back(tempT);
+						}
+						else
+							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
+					}
+					if (!tempT->existe())
+						type.pop_back();
 
-					typ.push_back(strtok(types, ": ,"));
-					while (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) == typ.end() - 1 /*&& t.back() est dans l'arbre de type*/) // lettres min
-						typ.push_back(strtok(NULL, " ,"));
-					if (typ.back() != NULL && find(typ.begin(), typ.end(), typ.back()) != typ.end() - 1)
-						cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-					else
-						typ.pop_back();
-
-					vector<vector<const char *>> fonc;
-					char *ligne;
 					while (fichier.peek() == '(')
 					{
-						getline(fichier, str);
-						ligne = new char[str.length() + 1];
-						strcpy(ligne, str.c_str());
-
-						clause.push_back(strtok(ligne, "( ,"));
-						int i = 0;
-						while (clause.back() != NULL && find(clause.begin(), clause.end(), clause.back()) == clause.end() - 1 /*&& c.back() est un arg de t.at(i++)*/) // lettres min
+						getline(fichier, ligne);
+						clause.push_back(strtok((char *)ligne.c_str(), "( ,"));
+						while (clause.back() != NULL && clause.size() <= type.size() && type.at(clause.size())->possede(clause.back()))
 							clause.push_back(strtok(NULL, " ,)"));
-						if (clause.back() != NULL && find(clause.begin(), clause.end(), clause.back()) != clause.end() - 1)
-							cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-						else
+						if (clause.back() == NULL && clause.size() > type.size())
 							clause.pop_back();
+						else if (!type.at(clause.size())->possede(clause.back()))
+							cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
+						else
+							cerr << "Le format des clauses est invalide." << endl; // arrêt??
 
 						fonc.push_back(clause);
-						clause.clear();
-						clause.shrink_to_fit();
+						vider(&clause);
 					}
 
+					vider(&type);
 					tempF->matrice = fonc;
 					arbreF->inserer(*tempF);
-					fonc.clear();
-					fonc.shrink_to_fit();
+					vider(&fonc);
 				}
 				else
 				{
 					cerr << "Entrée invalide." << endl; // arrêt??
 				}
-				typ.clear();
-				typ.shrink_to_fit();
-			} //else objet de même nom existe déjà
+			} //else objet de même nom existe déjà ou nom n'est pas alphabéthque
 		}
 
 		fichier.close();
-	}
 
-	else
-	{
-		cerr << "Impossible d'ouvrir le fichier." << endl;
-	}
+		/*--------------------------------------------------------
+	 	*
+	 	* Lecture Clavier
+	 	* 
+	 	* -------------------------------------------------------*/
 
-	/*--------------------------------------------------------
-	 *
-	 * Lecture Clavier
-	 * 
-	 * -------------------------------------------------------*/
-
-	string input;
-	while (getline(cin, input) && !cin.eof())
-	{
-		vector<string> vec;
-		//mettre chaque élément dans un vector)
-		vec.push_back(input);
-		size_t found = input.find_first_of("?(");
-		//Si la position du caractère doit ce trouver dans la chaine de catactère
-		if (found < input.length() && found > 0)
+		string input;
+		while (getline(cin, input) && !cin.eof())
 		{
-			//Coupe la chaine au ?
-			string identificateur = input.substr(0, found);
-			Fonctor *fonctor = new Fonctor(identificateur);
-			Type *type = new Type(identificateur);
-			if (input.at(found) == '?')
+			vector<string> vec;
+			//mettre chaque élément dans un vector)
+			vec.push_back(input);
+			size_t found = input.find_first_of("?(");
+			//Si la position du caractère doit ce trouver dans la chaine de catactère
+			if (found < input.length() && found > 0)
 			{
-
-				if (arbreF->contient(*fonctor))
+				//Coupe la chaine au ?
+				string identificateur = input.substr(0, found);
+				Fonctor *fonctor = new Fonctor(identificateur.c_str());
+				Type *type = new Type(identificateur.c_str());
+				if (input.at(found) == '?')
 				{
-					cout << arbreF->rechercheElement(*fonctor) << endl;
+					if (arbreF->contient(*fonctor))
+					{
+						cout << arbreF->rechercheElement(*fonctor) << endl;
+					}
+					else if (arbreT->contient(*type))
+					{
+						cout << arbreT->rechercheElement(*type) << endl;
+					}
+					else
+					{
+						cout << "PAS TROUVER" << endl;
+					}
 				}
-				else if (arbreT->contient(*type))
+				else if (input.at(found) == '(')
 				{
-					cout << arbreT->rechercheElement(*type) << endl;
-				}
-				else
-				{
-					cout << "PAS TROUVER" << endl;
-				}
-			}
-			else if (input.at(found) == '(')
-			{
-				cout << "Requete ()" << endl;
-				//Enlève la première parathèse
-				string elm = input.substr(found, input.find(')'));
+					cout << "Requete ()" << endl;
+					//Enlève la première parathèse
+					string elm = input.substr(found, input.find(')'));
 
-				//mettre chaque élément dans un vecteur
-				//puis trouver à quel index est le ?
-				//rechercher dans matrice ligne par ligne si ça correspond
+					//mettre chaque élément dans un vecteur
+					//puis trouver à quel index est le ?
+					//rechercher dans matrice ligne par ligne si ça correspond
 
-				vector<string> elmFonctor;				
-				size_t start = 0, end = 0;				
-				while ((end = input.find(',', start)) != string::npos)
-				{
+					vector<string> elmFonctor;
+					size_t start = 0, end = 0;
+					while ((end = input.find(',', start)) != string::npos)
+					{
+						if (end != start)
+						{
+							elmFonctor.push_back(input.substr(start, end - start));
+						}
+						start = end + 1;
+					}
 					if (end != start)
 					{
-						elmFonctor.push_back(input.substr(start, end - start));
+						elmFonctor.push_back(input.substr(start));
 					}
-					start = end + 1;
-				}
-				if (end != start)
-				{
-					elmFonctor.push_back(input.substr(start));
-				}
 
-				for (int i = 1; i < elmFonctor.size(); i++)
-				{
-					cout << elmFonctor.at(i) << endl;
+					for (int i = 1; i < elmFonctor.size(); i++)
+					{
+						cout << elmFonctor.at(i) << endl;
+					}
 				}
 			}
 		}
+	}
+	else
+	{
+		cerr << "Impossible d'ouvrir le fichier." << endl;
 	}
 
 	return 0;
