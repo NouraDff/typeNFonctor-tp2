@@ -33,8 +33,8 @@ int main(int argc, const char **argv)
 	if (fichier)
 	{
 
-		ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
-		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
+		ArbreAVL<Type*> *arbreT = new ArbreAVL<Type*>();
+		ArbreAVL<Fonctor*> *arbreF = new ArbreAVL<Fonctor*>();
 		Type *tempT;
 		Fonctor *tempF;
 		vector<const char *> arguments, clause;
@@ -44,10 +44,9 @@ int main(int argc, const char **argv)
 
 		while (fichier >> entree >> nom)
 		{
-
-			tempT = new Type(nom.c_str());
-			tempF = new Fonctor(nom.c_str());
-			if (estEnLettres(nom.c_str()) && !arbreT->contient(*tempT) && !arbreF->contient(*tempF))
+			tempT = new Type(nom);
+			tempF = new Fonctor(nom);
+			if (estEnLettres(nom.c_str()) && !arbreT->contient(tempT) && !arbreF->contient(tempF))
 			{
 				if (!entree.compare("type"))
 				{
@@ -65,7 +64,7 @@ int main(int argc, const char **argv)
 						arguments.pop_back();
 
 					tempT->idCollection = arguments;
-					arbreT->inserer(*tempT);
+					arbreT->inserer(tempT);
 					vider(&arguments);
 				}
 				else if (!entree.compare("foncteur"))
@@ -76,7 +75,7 @@ int main(int argc, const char **argv)
 					type.push_back(tempT);
 					while (tempT->existe())
 					{
-						if (arbreT->contient(*tempT))
+						if (arbreT->contient(tempT))
 						{
 							tempT = new Type(strtok(NULL, " ,"));
 							type.push_back(tempT);
@@ -106,7 +105,7 @@ int main(int argc, const char **argv)
 
 					vider(&type);
 					tempF->matrice = fonc;
-					arbreF->inserer(*tempF);
+					arbreF->inserer(tempF);
 					vider(&fonc);
 				}
 				else
@@ -140,13 +139,13 @@ int main(int argc, const char **argv)
 				Type *type = new Type(identificateur.c_str());
 				if (input.at(found) == '?')
 				{
-					if (arbreF->contient(*fonctor))
+					if (arbreF->contient(fonctor))
 					{
-						cout << arbreF->rechercheElement(*fonctor) << endl;
+						cout << arbreF->rechercheElement(fonctor) << endl;
 					}
-					else if (arbreT->contient(*type))
+					else if (arbreT->contient(type))
 					{
-						cout << arbreT->rechercheElement(*type) << endl;
+						cout << arbreT->rechercheElement(type) << endl;
 					}
 					else
 					{
