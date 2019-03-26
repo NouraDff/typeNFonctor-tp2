@@ -37,7 +37,7 @@ class ArbreAVL
     Iterateur rechercherEgalOuSuivant(const T &) const;
     Iterateur rechercherEgalOuPrecedent(const T &) const;
 
-    // Accès aux éléments de l'arbre via un intérateur.
+    // Accès aux éléments de l'arbre via un itérateur.
     const T &operator[](const Iterateur &) const;
     T &operator[](const Iterateur &);
 
@@ -349,7 +349,7 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercher(const T &e) const
             iter.chemin.empiler(n);
             n = n->gauche;
         }
-        else if (n->contenu < e)
+        else if (e > n->contenu)
             n = n->droite;
         else
         {

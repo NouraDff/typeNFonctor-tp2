@@ -27,26 +27,26 @@ void vider(vector<T> *vect)
 }
 
 int main(int argc, const char **argv)
-{ // vérifier erreurs d'entrée (ne fonctionne plus correctement depuis nouvelles fct...) comme si les objets étaient ajoutés à l'arbre et non effacés après
+{ 
 	ifstream fichier(argv[1], ios::in);
 
 	if (fichier)
 	{
 
-		ArbreAVL<Type*> *arbreT = new ArbreAVL<Type*>();
-		ArbreAVL<Fonctor*> *arbreF = new ArbreAVL<Fonctor*>();
+		ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
+		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;
 		Fonctor *tempF;
-		vector<const char *> arguments, clause;
-		vector<const Type *> type;
-		vector<vector<const char *>> fonc;
+		vector<char*> arguments, clause;
+		vector<Type*> type;
+		vector<vector<char*>> fonc;
 		string entree, nom, ligne;
 
 		while (fichier >> entree >> nom)
 		{
 			tempT = new Type(nom);
 			tempF = new Fonctor(nom);
-			if (estEnLettres(nom.c_str()) && !arbreT->contient(tempT) && !arbreF->contient(tempF))
+			if (estEnLettres(nom.c_str()) && !arbreT->contient(*tempT) && !arbreF->contient(*tempF))
 			{
 				if (!entree.compare("type"))
 				{
@@ -64,40 +64,42 @@ int main(int argc, const char **argv)
 						arguments.pop_back();
 
 					tempT->idCollection = arguments;
-					arbreT->inserer(tempT);
+					arbreT->inserer(*tempT);
 					vider(&arguments);
 				}
 				else if (!entree.compare("foncteur"))
 				{
 
 					getline(fichier, ligne);
-					tempT = new Type(strtok((char *)ligne.c_str(), ": ,"));
-					type.push_back(tempT);
-					while (tempT->existe())
+					arguments.push_back(strtok((char*)ligne.c_str(), ": ,"));
+					while (arguments.back() != NULL)
 					{
-						if (arbreT->contient(tempT))
-						{
-							tempT = new Type(strtok(NULL, " ,"));
-							type.push_back(tempT);
-						}
-						else
+						tempT = new Type((string)arguments.back());
+						if (!arbreT->contient(*tempT)){
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
+							arguments.push_back(NULL);
+						}else{
+							*tempT = arbreT[arbreT->rechercher(*tempT)]; // l'opérateur [] ne fonctionne pas correctement...
+							type.push_back(tempT);
+							arguments.push_back(strtok(NULL, " ,"));
+						}
 					}
-					if (!tempT->existe())
-						type.pop_back();
-
+					vider(&arguments);
+					
 					while (fichier.peek() == '(')
 					{
 						getline(fichier, ligne);
 						clause.push_back(strtok((char *)ligne.c_str(), "( ,"));
-						while (clause.back() != NULL && clause.size() <= type.size() && type.at(clause.size())->possede(clause.back()))
+						while (clause.back() != NULL && clause.size() <= type.size() && type.at(clause.size()-1)->possede(clause.back()))
 							clause.push_back(strtok(NULL, " ,)"));
-						if (clause.back() == NULL && clause.size() > type.size())
+						if (clause.back() == NULL)
 							clause.pop_back();
-						else if (!type.at(clause.size())->possede(clause.back()))
-							cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
-						else
+						if(clause.size() != type.size()){
+							vider(&clause);
 							cerr << "Le format des clauses est invalide." << endl; // arrêt??
+							break;
+						}else if (!type.at(clause.size()-1)->possede(clause.back()))
+							cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 
 						fonc.push_back(clause);
 						vider(&clause);
@@ -105,12 +107,13 @@ int main(int argc, const char **argv)
 
 					vider(&type);
 					tempF->matrice = fonc;
-					arbreF->inserer(tempF);
+					arbreF->inserer(*tempF);
 					vider(&fonc);
 				}
 				else
 				{
 					cerr << "Entrée invalide." << endl; // arrêt??
+					break;
 				}
 			} //else objet de même nom existe déjà ou nom n'est pas alphabéthque
 		}
@@ -139,13 +142,13 @@ int main(int argc, const char **argv)
 				Type *type = new Type(identificateur.c_str());
 				if (input.at(found) == '?')
 				{
-					if (arbreF->contient(fonctor))
+					if (arbreF->contient(*fonctor))
 					{
-						cout << arbreF->rechercheElement(fonctor) << endl;
+						cout << arbreF->rechercheElement(*fonctor) << endl;
 					}
-					else if (arbreT->contient(type))
+					else if (arbreT->contient(*type))
 					{
-						cout << arbreT->rechercheElement(type) << endl;
+						cout << arbreT->rechercheElement(*type) << endl;
 					}
 					else
 					{

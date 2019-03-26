@@ -5,23 +5,26 @@ class Type
 {
 public:
     string identificateur; 
-    vector<const char*> idCollection; 
+    vector<char*> idCollection; 
 
 	// Opérateurs:
-	bool operator<(Type const& droit) const;
-	bool operator>(Type const& droit) const;
+	operator bool() const;
+	bool operator!() const;
+	friend bool operator<(Type const& gauche, Type const& droit);
+	friend bool operator>(Type const& gauche, Type const& droit);
 	Type &operator=(const Type& autre);
-    friend ostream &operator<<(ostream &os, const Type &type);
+	friend ostream &operator<<(ostream &os, const Type &type);
 
     Type();
     Type(string id);
     ~Type();
 
-	bool existe() const;
 	bool possede(const char* argument) const;
 
 	private:
 		void afficher(ostream &os) const;
+		bool plusPetit(Type const& droit) const;
+		bool plusGrand(Type const& droit) const;
 };
 
 Type::Type()
@@ -40,11 +43,14 @@ Type::~Type()
     idCollection.clear(); //.shrink_to_fit ? et id = NULL?
 }
 
-bool Type::existe() const // changer pour opérateur bool() et !()
+Type::operator bool() const
 {
-	if(identificateur == "")
-		return false;
-	return true;
+	return identificateur != "";
+}
+
+bool Type::operator!() const 
+{
+	return identificateur == "";
 }
 
 bool Type::possede(const char* argument) const
@@ -54,20 +60,30 @@ bool Type::possede(const char* argument) const
 	return false;
 }
 
-bool Type::operator<(Type const& droit) const
+bool operator<(Type const& gauche, Type const& droit) 
 {
-    if(identificateur < droit.identificateur){
-        return true;
-    }   
-    return false; 
+    return gauche.plusPetit(droit); 
 }
 
-bool Type::operator>(Type const& droit) const 
+bool Type::plusPetit(Type const& droit) const
+{
+	if(identificateur < droit.identificateur){
+        	return true;
+    	}
+    	return false;
+}
+
+bool operator>(Type const& gauche, Type const& droit)
+{
+    return gauche.plusGrand(droit); 
+}
+
+bool Type::plusGrand(Type const& droit) const
 {
     if(identificateur > droit.identificateur){
         return true;
-    }   
-    return false; 
+    }
+    return false;
 }
 
 Type &Type::operator=(const Type& autre) 
