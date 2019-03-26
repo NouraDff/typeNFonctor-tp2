@@ -11,7 +11,7 @@ public:
 	bool operator<(Type const& droit) const;
 	bool operator>(Type const& droit) const;
 	Type &operator=(const Type& autre);
-    	friend ostream &operator<<(ostream &os, const Type &type);
+    friend ostream &operator<<(ostream &os, const Type &type);
 
     Type();
     Type(const char* id);

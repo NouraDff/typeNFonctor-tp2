@@ -5,13 +5,13 @@ class Fonctor
 {
   public:
     string identificateur;
-    vector<vector<const char*>> matrice;
+    vector<vector<const char *>> matrice;
 
-  // Opérateurs
+    // Opérateurs
     bool operator>(Fonctor const &droit) const;
     bool operator<(Fonctor const &droit) const;
-    Fonctor &operator=(const Fonctor& autre);
-    friend ostream &operator<<(ostream &os, const Fonctor& fonctor);
+    Fonctor &operator=(const Fonctor &autre);
+    friend ostream &operator<<(ostream &os, const Fonctor &fonctor);
 
     Fonctor();
     Fonctor(string id);
@@ -22,7 +22,7 @@ class Fonctor
 };
 
 Fonctor::Fonctor()
-	: identificateur(NULL), matrice(0)
+    : identificateur(NULL), matrice(0)
 {
 }
 
@@ -54,20 +54,20 @@ bool Fonctor::operator>(Fonctor const &droit) const
     return false;
 }
 
-Fonctor &Fonctor::operator=(const Fonctor& autre)
+Fonctor &Fonctor::operator=(const Fonctor &autre)
 {
-	if (this == &autre)
-        {
-            return *this;
-        }
-	identificateur = autre.identificateur;
-	matrice = autre.matrice;
-	return *this;
-} 
+    if (this == &autre)
+    {
+        return *this;
+    }
+    identificateur = autre.identificateur;
+    matrice = autre.matrice;
+    return *this;
+}
 
-ostream &operator<<(ostream &os, const Fonctor& fonctor)
-{ 
-	fonctor.afficher(os);
+ostream &operator<<(ostream &os, const Fonctor &fonctor)
+{
+    fonctor.afficher(os);
     return os;
 }
 

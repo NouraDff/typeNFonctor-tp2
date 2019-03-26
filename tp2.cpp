@@ -121,7 +121,7 @@ int main(int argc, const char **argv)
 		/*--------------------------------------------------------
 	 	*
 	 	* Lecture Clavier
-	 	* 
+	 	*
 	 	* -------------------------------------------------------*/
 
 		string input;
@@ -155,30 +155,35 @@ int main(int argc, const char **argv)
 				}
 				else if (input.at(found) == '(')
 				{
-					cout << "Requete ()" << endl;
-					//Enlève la première parathèse
-					string elm = input.substr(found, input.find(')'));
 
 					//mettre chaque élément dans un vecteur
 					//puis trouver à quel index est le ?
 					//rechercher dans matrice ligne par ligne si ça correspond
 
+					cout << "Requete ()" << endl;
+					//elm contient la string entre parenthèrse
+					string elm = input.substr(found, input.find(')'));
+
 					vector<string> elmFonctor;
 					size_t start = 0, end = 0;
-					while ((end = input.find(',', start)) != string::npos)
+
+					elmFonctor.push_back(strtok((char *)elm.c_str(), "(,"));
+
+					while ((end = elm.find(')', start)) != string::npos)
 					{
 						if (end != start)
 						{
-							elmFonctor.push_back(input.substr(start, end - start));
+							elmFonctor.push_back(strtok(NULL, ","));
 						}
 						start = end + 1;
 					}
 					if (end != start)
 					{
-						elmFonctor.push_back(input.substr(start));
+						elmFonctor.push_back(strtok(NULL, ",)"));
 					}
 
-					for (int i = 1; i < elmFonctor.size(); i++)
+
+					for (int i = 0; i < elmFonctor.size(); i++)
 					{
 						cout << elmFonctor.at(i) << endl;
 					}
