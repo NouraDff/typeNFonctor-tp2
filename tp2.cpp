@@ -89,10 +89,12 @@ int main(int argc, const char **argv)
 						{
 							clause.push_back(p);
 							if(clause.size() > type.size())
-								cerr << "Le format des clauses est invalide." << endl; // arrêt??
+								// arrêt??
 							else if(!type.at(clause.size() - 1)->possede(clause.back()))
 								cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 						}
+						if(clause.size() != type.size())
+							cerr << "Le format des clauses est invalide." << endl; // arrêt??
 
 						fonc.push_back(clause);
 						vider(&clause);
@@ -193,7 +195,7 @@ int main(int argc, const char **argv)
 								}
 								else
 								{
-									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index - 1, it);
+									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index, it);
 									sousClause2 = equal(fonctor->matrice[i].begin() + index + 1, fonctor->matrice[i].end(), it + 1);
 								}
 
