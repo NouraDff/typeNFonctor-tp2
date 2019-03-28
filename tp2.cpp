@@ -136,6 +136,7 @@ int main(int argc, const char **argv)
 				char *identificateur = strtok(temp, "?(");
 				Fonctor *fonctor = new Fonctor(identificateur);
 				Type *type = new Type(identificateur);
+				delete [] temp; 
 				if (input.at(found) == '?')
 				{
 					if (arbreF->contient(*fonctor))
@@ -210,8 +211,9 @@ int main(int argc, const char **argv)
 									cout << sep << *(fonctor->matrice[i].begin() + index);
 									sep = ", ";
 								}
-								cout << "}" << endl;
 							}
+							
+								cout << "}" << endl;
 						}
 					}
 					else
