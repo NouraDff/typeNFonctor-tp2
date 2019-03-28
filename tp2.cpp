@@ -193,7 +193,7 @@ int main(int argc, const char **argv)
 								}
 								else
 								{
-									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index - 1, it);
+									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index, elmFonctor.begin() );
 									sousClause2 = equal(fonctor->matrice[i].begin() + index + 1, fonctor->matrice[i].end(), it + 1);
 								}
 
