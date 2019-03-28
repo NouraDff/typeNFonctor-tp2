@@ -27,7 +27,7 @@ void vider(vector<T> *vect)
 }
 
 int main(int argc, const char **argv)
-{ 
+{
 	ifstream fichier(argv[1], ios::in);
 
 	if (fichier)
@@ -37,9 +37,9 @@ int main(int argc, const char **argv)
 		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;
 		Fonctor *tempF;
-		vector<char*> arguments, clause;
-		vector<Type*> type;
-		vector<vector<char*>> fonc;
+		vector<char *> arguments, clause;
+		vector<Type *> type;
+		vector<vector<char *>> fonc;
 		string entree, nom, ligne;
 
 		while (fichier >> entree >> nom)
@@ -71,34 +71,39 @@ int main(int argc, const char **argv)
 				{
 
 					getline(fichier, ligne);
-					arguments.push_back(strtok((char*)ligne.c_str(), ": ,"));
+					arguments.push_back(strtok((char *)ligne.c_str(), ": ,"));
 					while (arguments.back() != NULL)
 					{
 						tempT = new Type((string)arguments.back());
-						if (!arbreT->contient(*tempT)){
+						if (!arbreT->contient(*tempT))
+						{
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
 							arguments.push_back(NULL);
-						}else{
-							*tempT = arbreT[arbreT->rechercher(*tempT)]; // l'opérateur [] ne fonctionne pas correctement...
+						}
+						else
+						{
+							*tempT = arbreT->rechercheElement(*tempT); // l'opérateur [] ne fonctionne pas correctement...
 							type.push_back(tempT);
 							arguments.push_back(strtok(NULL, " ,"));
 						}
 					}
 					vider(&arguments);
-					
+
 					while (fichier.peek() == '(')
 					{
 						getline(fichier, ligne);
 						clause.push_back(strtok((char *)ligne.c_str(), "( ,"));
-						while (clause.back() != NULL && clause.size() <= type.size() && type.at(clause.size()-1)->possede(clause.back()))
+						while (clause.back() != NULL && clause.size() <= type.size() && type.at(clause.size() - 1)->possede(clause.back()))
 							clause.push_back(strtok(NULL, " ,)"));
 						if (clause.back() == NULL)
 							clause.pop_back();
-						if(clause.size() != type.size()){
+						if (clause.size() != type.size())
+						{
 							vider(&clause);
 							cerr << "Le format des clauses est invalide." << endl; // arrêt??
 							break;
-						}else if (!type.at(clause.size()-1)->possede(clause.back()))
+						}
+						else if (!type.at(clause.size() - 1)->possede(clause.back()))
 							cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 
 						fonc.push_back(clause);
@@ -136,10 +141,13 @@ int main(int argc, const char **argv)
 			//Si la position du caractère doit ce trouver dans la chaine de catactère
 			if (found < input.length() && found > 0)
 			{
+				//Copie l'entree afin qu'il ne soit pas modifé par le strtok
+				char* temp = new char[input.length()]; 
+				strcpy(temp, (char*)input.c_str());
 				//Coupe la chaine au ?
-				string identificateur = input.substr(0, found);
-				Fonctor *fonctor = new Fonctor(identificateur.c_str());
-				Type *type = new Type(identificateur.c_str());
+				char * identificateur = strtok(temp, &input.at(found)) ;
+				Fonctor *fonctor = new Fonctor(identificateur);
+				Type *type = new Type(identificateur);
 				if (input.at(found) == '?')
 				{
 					if (arbreF->contient(*fonctor))
@@ -158,32 +166,50 @@ int main(int argc, const char **argv)
 				else if (input.at(found) == '(')
 				{
 
-					//mettre chaque élément dans un vecteur
-					//puis trouver à quel index est le ?
-					//rechercher dans matrice ligne par ligne si ça correspond
+					//mettre chaque élément dans un vecteur | x
+					//puis trouver à quel index est le ? |
+					//rechercher dans matrice ligne par ligne si ça correspond |
 
 					cout << "Requete ()" << endl;
 					//elm contient la string entre parenthèrse
 					string elm = input.substr(found, input.find(')'));
-
+					cout << elm << endl;
 					vector<string> elmFonctor;
 					size_t start = 0, end = 0;
 
-					elmFonctor.push_back(strtok((char *)elm.c_str(), "(,"));
-
-					while ((end = elm.find(')', start)) != string::npos)
-					{
-						if (end != start)
-						{
-							elmFonctor.push_back(strtok(NULL, ","));
-						}
-						start = end + 1;
+					char * pelm = (char *)elm.c_str();
+					cout << pelm << endl;
+					pelm = strtok(pelm, "( ");
+					elmFonctor.push_back(pelm);
+					//Met les éléments dans vecteur
+					while(pelm != NULL){
+						pelm = strtok(NULL, ", "); 
+						elmFonctor.push_back(pelm);
 					}
-					if (end != start)
+					// while ((end = elm.find(')', start)) != string::npos)
+					// {
+					// 	if (end != start)
+					// 	{
+					// 		elmFonctor.push_back(strtok(NULL, ", "));
+					// 	}
+					// 	start = end + 1;
+					// }
+					// if (end != start)
+					// {
+					// 	elmFonctor.push_back(strtok(NULL, " )"));
+					// }
+
+					//Itérateur positionner au ?
+					vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
+					int index;
+					if (it != elmFonctor.end())
 					{
-						elmFonctor.push_back(strtok(NULL, ",)"));
+						index = distance(elmFonctor.begin(), it);
+						cout << "Element Found " << index << endl;
 					}
 
+					else
+						cout << "Element Not Found" << endl;
 
 					for (int i = 0; i < elmFonctor.size(); i++)
 					{
