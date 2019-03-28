@@ -88,9 +88,9 @@ int main(int argc, const char **argv)
 						for(char *p = strtok((char *)ligne.c_str(), "( ,"); p != NULL; p = strtok(NULL, " ,)"))
 						{
 							clause.push_back(p);
-							if(clause.size() > type.size())
+							if(clause.size() > type.size()){
 								// arrêt??
-							else if(!type.at(clause.size() - 1)->possede(clause.back()))
+							}else if(!type.at(clause.size() - 1)->possede(clause.back()))
 								cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 						}
 						if(clause.size() != type.size())
