@@ -76,7 +76,7 @@ int main(int argc, const char **argv)
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
 						else
 						{
-							*tempT = arbreT->rechercheElement(*tempT);
+							*tempT = *(arbreT->rechercher(*tempT)); //arbreT->rechercheElement(*tempT);
 							type.push_back(tempT);
 						}
 					}
@@ -136,7 +136,6 @@ int main(int argc, const char **argv)
 				char *identificateur = strtok(temp, "?(");
 				Fonctor *fonctor = new Fonctor(identificateur);
 				Type *type = new Type(identificateur);
-				delete [] temp; 
 				if (input.at(found) == '?')
 				{
 					if (arbreF->contient(*fonctor))
@@ -211,9 +210,9 @@ int main(int argc, const char **argv)
 									cout << sep << *(fonctor->matrice[i].begin() + index);
 									sep = ", ";
 								}
+								
 							}
-							
-								cout << "}" << endl;
+							cout << "}" << endl;
 						}
 					}
 					else
