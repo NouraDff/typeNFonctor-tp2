@@ -20,7 +20,7 @@ bool estEnLettres(const char *id)
 }
 
 template <class T>
-void vider(vector<T>* vect)
+void vider(vector<T> *vect)
 {
 	vect->clear();
 	vect->shrink_to_fit();
@@ -52,12 +52,12 @@ int main(int argc, const char **argv)
 				{
 
 					getline(fichier, ligne);
-					for (char *p = strtok((char*)ligne.c_str(), "= {,"); p != NULL; p = strtok(NULL, " ,}"))
+					for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
 					{
-						arguments.push_back( p );
-						if(!estEnLettres(p))
+						arguments.push_back(p);
+						if (!estEnLettres(p))
 							cerr << "Les arguments ne contiennent pas uniquement que des lettres." << endl; // arrêt??
-						if(find(arguments.begin(), arguments.end(), p) == arguments.end())
+						if (find(arguments.begin(), arguments.end(), p) == arguments.end())
 							cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
 					}
 
@@ -69,31 +69,32 @@ int main(int argc, const char **argv)
 				{
 
 					getline(fichier, ligne);
-					for(char *p = strtok((char*)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
-					{	
+					for (char *p = strtok((char *)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
+					{
 						tempT = new Type(p);
 						if (!arbreT->contient(*tempT))
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
 						else
 						{
-							*tempT = arbreT->rechercheElement(*tempT); 
+							*tempT = arbreT->rechercheElement(*tempT);
 							type.push_back(tempT);
 						}
 					}
 
-
 					while (fichier.peek() == '(')
 					{
 						getline(fichier, ligne);
-						for(char *p = strtok((char *)ligne.c_str(), "( ,"); p != NULL; p = strtok(NULL, " ,)"))
+						for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
 						{
 							clause.push_back(p);
-							if(clause.size() > type.size()){
+							if (clause.size() > type.size())
+							{
 								// arrêt??
-							}else if(!type.at(clause.size() - 1)->possede(clause.back()))
+							}
+							else if (!type.at(clause.size() - 1)->possede(clause.back()))
 								cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 						}
-						if(clause.size() != type.size())
+						if (clause.size() != type.size())
 							cerr << "Le format des clauses est invalide." << endl; // arrêt??
 
 						fonc.push_back(clause);
@@ -132,18 +133,18 @@ int main(int argc, const char **argv)
 				char *temp = new char[input.length()];
 				strcpy(temp, (char *)input.c_str());
 				//Coupe la chaine au ?
-				char *identificateur = strtok(temp, &input.at(found));
+				char *identificateur = strtok(temp, "?(");
 				Fonctor *fonctor = new Fonctor(identificateur);
 				Type *type = new Type(identificateur);
 				if (input.at(found) == '?')
 				{
 					if (arbreF->contient(*fonctor))
 					{
-						cout << arbreF->rechercheElement(*fonctor) << endl;
+						cout << arbreF->rechercheElement(*fonctor);
 					}
 					else if (arbreT->contient(*type))
 					{
-						cout << arbreT->rechercheElement(*type) << endl;
+						cout << arbreT->rechercheElement(*type);
 					}
 					else
 					{
@@ -159,12 +160,12 @@ int main(int argc, const char **argv)
 
 					char *clause = new char[elm.length()];
 					clause = (char *)elm.c_str();
-					clause = strtok(clause, "( ,");
+					clause = strtok(clause, "( ,)");
 					elmFonctor.push_back(clause);
 					//Met les éléments dans vecteur
 					while (clause != NULL)
 					{
-						clause = strtok(NULL, ", )");
+						clause = strtok(NULL, "(), )");
 						if (clause != NULL)
 							elmFonctor.push_back(clause);
 					}
@@ -183,19 +184,24 @@ int main(int argc, const char **argv)
 							string sep = "";
 							for (int i = 0; i < fonctor->matrice.size(); i++)
 							{
+								if (elmFonctor.size() == 1)
+								{
+									sousClause1 = true;
+									sousClause2 = true;
+								}
 								if (it == elmFonctor.begin())
 								{
 									sousClause1 = equal(fonctor->matrice[i].begin() + 1, fonctor->matrice[i].end(), it + 1);
 									sousClause2 = true;
 								}
-								else if (it == elmFonctor.end()-1)
+								else if (it == elmFonctor.end() - 1)
 								{
-									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin()+ index, elmFonctor.begin() );
-									sousClause2 = true; 
+									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index, elmFonctor.begin());
+									sousClause2 = true;
 								}
 								else
 								{
-									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index, elmFonctor.begin() );
+									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index, elmFonctor.begin());
 									sousClause2 = equal(fonctor->matrice[i].begin() + index + 1, fonctor->matrice[i].end(), it + 1);
 								}
 
@@ -204,9 +210,9 @@ int main(int argc, const char **argv)
 									cout << sep << *(fonctor->matrice[i].begin() + index);
 									sep = ", ";
 								}
+								cout << "}" << endl;
 							}
 						}
-						cout << "}" << endl;
 					}
 					else
 					{
