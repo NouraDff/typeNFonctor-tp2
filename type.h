@@ -19,7 +19,7 @@ public:
     Type(string id);
     ~Type();
 
-	bool possede(const char* argument) const;
+	bool possede(const string argument) const;
 
 	private:
 		void afficher(ostream &os) const;
@@ -53,7 +53,7 @@ bool Type::operator!() const
 	return identificateur == "";
 }
 
-bool Type::possede(const char* argument) const
+bool Type::possede(const string argument) const
 {
 	if(find(idCollection.begin(), idCollection.end(), argument)!=idCollection.end())
 		return true;

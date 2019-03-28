@@ -5,7 +5,7 @@ class Fonctor
 {
   public:
     string identificateur;
-    vector<vector<char *>> matrice;
+    vector<vector<string>> matrice;
 
     // Opérateurs
     bool operator>(Fonctor const &droit) const;

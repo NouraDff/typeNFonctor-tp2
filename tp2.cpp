@@ -37,9 +37,10 @@ int main(int argc, const char **argv)
 		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;
 		Fonctor *tempF;
-		vector<char *> arguments, clause;
+		vector<char *> arguments;
+		vector<string> clause;
 		vector<Type *> type;
-		vector<vector<char *>> fonc;
+		vector<vector<string>> fonc;
 		string entree, nom, ligne;
 
 		while (fichier >> entree >> nom)
@@ -93,9 +94,9 @@ int main(int argc, const char **argv)
 					{
 						getline(fichier, ligne);
 						clause.push_back(strtok((char *)ligne.c_str(), "( ,"));
-						while (clause.back() != NULL && clause.size() <= type.size() && type.at(clause.size() - 1)->possede(clause.back()))
+						while (clause.back() != "" && clause.size() <= type.size() && type.at(clause.size() - 1)->possede(clause.back()))
 							clause.push_back(strtok(NULL, " ,)"));
-						if (clause.back() == NULL)
+						if (clause.back() == "")
 							clause.pop_back();
 						if (clause.size() != type.size())
 						{
@@ -130,6 +131,12 @@ int main(int argc, const char **argv)
 	 	* Lecture Clavier
 	 	*
 	 	* -------------------------------------------------------*/
+		vector<vector<string>> fct{{"vrai", "vrai", "vrai"},
+								   {"faux", "faux", "faux"},
+								   {"vrai", "faux", "vrai"}};
+		Fonctor *fonctor1 = new Fonctor("C");
+		fonctor1->matrice = fct;
+		arbreF->inserer(*fonctor1);
 
 		string input;
 		while (getline(cin, input) && !cin.eof())
@@ -142,10 +149,10 @@ int main(int argc, const char **argv)
 			if (found < input.length() && found > 0)
 			{
 				//Copie l'entree afin qu'il ne soit pas modifé par le strtok
-				char* temp = new char[input.length()]; 
-				strcpy(temp, (char*)input.c_str());
+				char *temp = new char[input.length()];
+				strcpy(temp, (char *)input.c_str());
 				//Coupe la chaine au ?
-				char * identificateur = strtok(temp, &input.at(found)) ;
+				char *identificateur = strtok(temp, &input.at(found));
 				Fonctor *fonctor = new Fonctor(identificateur);
 				Type *type = new Type(identificateur);
 				if (input.at(found) == '?')
@@ -165,55 +172,65 @@ int main(int argc, const char **argv)
 				}
 				else if (input.at(found) == '(')
 				{
-
-					//mettre chaque élément dans un vecteur | x
-					//puis trouver à quel index est le ? |
-					//rechercher dans matrice ligne par ligne si ça correspond |
-
-					cout << "Requete ()" << endl;
 					//elm contient la string entre parenthèrse
 					string elm = input.substr(found, input.find(')'));
-					cout << elm << endl;
 					vector<string> elmFonctor;
 					size_t start = 0, end = 0;
 
-					char * pelm = (char *)elm.c_str();
-					cout << pelm << endl;
-					pelm = strtok(pelm, "( ");
-					elmFonctor.push_back(pelm);
+					char *clause = new char[elm.length()];
+					clause = (char *)elm.c_str();
+					clause = strtok(clause, "( ,");
+					elmFonctor.push_back(clause);
 					//Met les éléments dans vecteur
-					while(pelm != NULL){
-						pelm = strtok(NULL, ", "); 
-						elmFonctor.push_back(pelm);
+					while (clause != NULL)
+					{
+						clause = strtok(NULL, ", )");
+						if (clause != NULL)
+							elmFonctor.push_back(clause);
 					}
-					// while ((end = elm.find(')', start)) != string::npos)
-					// {
-					// 	if (end != start)
-					// 	{
-					// 		elmFonctor.push_back(strtok(NULL, ", "));
-					// 	}
-					// 	start = end + 1;
-					// }
-					// if (end != start)
-					// {
-					// 	elmFonctor.push_back(strtok(NULL, " )"));
-					// }
 
 					//Itérateur positionner au ?
 					vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
 					int index;
+					bool sousClause1, sousClause2;
 					if (it != elmFonctor.end())
 					{
 						index = distance(elmFonctor.begin(), it);
-						cout << "Element Found " << index << endl;
+						if (arbreF->contient(*fonctor))
+						{
+							*fonctor = arbreF->rechercheElement(*fonctor);
+							cout << "{";
+							string sep = "";
+							for (int i = 0; i < fonctor->matrice.size(); i++)
+							{
+								if (it == elmFonctor.begin())
+								{
+									sousClause1 = equal(fonctor->matrice[i].begin() + 1, fonctor->matrice[i].end(), it + 1);
+									sousClause2 = true;
+								}
+								else if (it == elmFonctor.end()-1)
+								{
+									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin()+ index, elmFonctor.begin() );
+									sousClause2 = true; 
+								}
+								else
+								{
+									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index - 1, it);
+									sousClause2 = equal(fonctor->matrice[i].begin() + index + 1, fonctor->matrice[i].end(), it + 1);
+								}
+
+								if (sousClause1 && sousClause2)
+								{
+									cout << sep << *(fonctor->matrice[i].begin() + index);
+									sep = ", ";
+								}
+							}
+						}
+						cout << "}" << endl;
 					}
-
 					else
-						cout << "Element Not Found" << endl;
-
-					for (int i = 0; i < elmFonctor.size(); i++)
 					{
-						cout << elmFonctor.at(i) << endl;
+						cout << "Element Not Found" << endl;
 					}
 				}
 			}
