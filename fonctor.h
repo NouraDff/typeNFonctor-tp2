@@ -5,12 +5,11 @@ class Fonctor
 {
   public:
     string identificateur;
-    vector<vector<char *>> matrice;
+    vector<vector<string>> matrice;
 
     // Opérateurs
-    bool operator>(Fonctor const &droit) const;
-    bool operator<(Fonctor const &droit) const;
-    Fonctor &operator=(const Fonctor &autre);
+    friend bool operator>(Fonctor const* gauche, Fonctor const droit);
+    friend bool operator<(Fonctor const* gauche, Fonctor const droit);
     friend ostream &operator<<(ostream &os, const Fonctor &fonctor);
 
     Fonctor();
@@ -19,10 +18,12 @@ class Fonctor
 
   private:
     void afficher(ostream &os) const;
+    bool plusGrand(Fonctor const& droit) const;
+    bool plusPetit(Fonctor const& droit) const;
 };
 
 Fonctor::Fonctor()
-    : identificateur(NULL), matrice(0)
+    : identificateur(""), matrice(0)
 {
 }
 
@@ -36,7 +37,12 @@ Fonctor::~Fonctor()
     matrice.clear();
 }
 
-bool Fonctor::operator<(Fonctor const &droit) const
+bool operator<(Fonctor const* gauche, Fonctor const droit)
+{
+	return gauche->plusPetit(droit);
+}
+
+bool Fonctor::plusPetit(Fonctor const& droit) const
 {
     if (identificateur < droit.identificateur)
     {
@@ -45,24 +51,18 @@ bool Fonctor::operator<(Fonctor const &droit) const
     return false;
 }
 
-bool Fonctor::operator>(Fonctor const &droit) const
+bool operator>(Fonctor const* gauche, Fonctor const droit)
+{
+	return gauche->plusGrand(droit);
+}
+
+bool Fonctor::plusGrand(Fonctor const& droit) const
 {
     if (identificateur > droit.identificateur)
     {
         return true;
     }
     return false;
-}
-
-Fonctor &Fonctor::operator=(const Fonctor &autre)
-{
-    if (this == &autre)
-    {
-        return *this;
-    }
-    identificateur = autre.identificateur;
-    matrice = autre.matrice;
-    return *this;
 }
 
 ostream &operator<<(ostream &os, const Fonctor &fonctor)

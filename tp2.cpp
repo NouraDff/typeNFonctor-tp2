@@ -20,7 +20,7 @@ bool estEnLettres(const char *id)
 }
 
 template <class T>
-void vider(vector<T> *vect)
+void vider(vector<T>* vect)
 {
 	vect->clear();
 	vect->shrink_to_fit();
@@ -37,31 +37,29 @@ int main(int argc, const char **argv)
 		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
 		Type *tempT;
 		Fonctor *tempF;
-		vector<char *> arguments, clause;
+		vector<string> arguments, clause;
 		vector<Type *> type;
-		vector<vector<char *>> fonc;
+		vector<vector<string>> fonc;
 		string entree, nom, ligne;
 
 		while (fichier >> entree >> nom)
 		{
 			tempT = new Type(nom);
 			tempF = new Fonctor(nom);
-			if (estEnLettres(nom.c_str()) && !arbreT->contient(*tempT) && !arbreF->contient(*tempF))
+			if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT->contient(*tempT) && !arbreF->contient(*tempF))
 			{
 				if (!entree.compare("type"))
 				{
 
 					getline(fichier, ligne);
-					arguments.push_back(strtok((char *)ligne.c_str(), "= {,"));
-					while (arguments.back() != NULL && find(arguments.begin(), arguments.end(), arguments.back()) == arguments.end() - 1)
-						if (estEnLettres(arguments.back()))
-							arguments.push_back(strtok(NULL, " ,}"));
-						else
+					for (char *p = strtok((char*)ligne.c_str(), "= {,"); p != NULL; p = strtok(NULL, " ,}"))
+					{
+						arguments.push_back( p );
+						if(!estEnLettres(p))
 							cerr << "Les arguments ne contiennent pas uniquement que des lettres." << endl; // arrêt??
-					if (arguments.back() != NULL && find(arguments.begin(), arguments.end(), arguments.back()) != arguments.end() - 1)
-						cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-					else
-						arguments.pop_back();
+						if(find(arguments.begin(), arguments.end(), p) == arguments.end())
+							cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
+					}
 
 					tempT->idCollection = arguments;
 					arbreT->inserer(*tempT);
@@ -71,40 +69,30 @@ int main(int argc, const char **argv)
 				{
 
 					getline(fichier, ligne);
-					arguments.push_back(strtok((char *)ligne.c_str(), ": ,"));
-					while (arguments.back() != NULL)
-					{
-						tempT = new Type((string)arguments.back());
+					for(char *p = strtok((char*)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
+					{	
+						tempT = new Type(p);
 						if (!arbreT->contient(*tempT))
-						{
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
-							arguments.push_back(NULL);
-						}
 						else
 						{
-							*tempT = arbreT->rechercheElement(*tempT); // l'opérateur [] ne fonctionne pas correctement...
+							*tempT = arbreT->rechercheElement(*tempT); 
 							type.push_back(tempT);
-							arguments.push_back(strtok(NULL, " ,"));
 						}
 					}
-					vider(&arguments);
+
 
 					while (fichier.peek() == '(')
 					{
 						getline(fichier, ligne);
-						clause.push_back(strtok((char *)ligne.c_str(), "( ,"));
-						while (clause.back() != NULL && clause.size() <= type.size() && type.at(clause.size() - 1)->possede(clause.back()))
-							clause.push_back(strtok(NULL, " ,)"));
-						if (clause.back() == NULL)
-							clause.pop_back();
-						if (clause.size() != type.size())
+						for(char *p = strtok((char *)ligne.c_str(), "( ,"); p != NULL; p = strtok(NULL, " ,)"))
 						{
-							vider(&clause);
-							cerr << "Le format des clauses est invalide." << endl; // arrêt??
-							break;
+							clause.push_back(p);
+							if(clause.size() > type.size())
+								cerr << "Le format des clauses est invalide." << endl; // arrêt??
+							else if(!type.at(clause.size() - 1)->possede(clause.back()))
+								cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 						}
-						else if (!type.at(clause.size() - 1)->possede(clause.back()))
-							cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 
 						fonc.push_back(clause);
 						vider(&clause);
@@ -120,7 +108,7 @@ int main(int argc, const char **argv)
 					cerr << "Entrée invalide." << endl; // arrêt??
 					break;
 				}
-			} //else objet de même nom existe déjà ou nom n'est pas alphabéthque
+			} //else objet de même nom existe déjà ou nom n'est pas alphabéthque ou correspond à mots réservés
 		}
 
 		fichier.close();
@@ -134,9 +122,6 @@ int main(int argc, const char **argv)
 		string input;
 		while (getline(cin, input) && !cin.eof())
 		{
-			vector<string> vec;
-			//mettre chaque élément dans un vector)
-			vec.push_back(input);
 			size_t found = input.find_first_of("?(");
 			//Si la position du caractère doit ce trouver dans la chaine de catactère
 			if (found < input.length() && found > 0)
@@ -184,7 +169,8 @@ int main(int argc, const char **argv)
 					//Met les éléments dans vecteur
 					while(pelm != NULL){
 						pelm = strtok(NULL, ", "); 
-						elmFonctor.push_back(pelm);
+						if(pelm != NULL)
+							elmFonctor.push_back(pelm);
 					}
 					// while ((end = elm.find(')', start)) != string::npos)
 					// {

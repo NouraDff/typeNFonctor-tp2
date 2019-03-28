@@ -5,21 +5,20 @@ class Type
 {
 public:
     string identificateur; 
-    vector<char*> idCollection; 
+    vector<string> idCollection; 
 
 	// Opérateurs:
 	operator bool() const;
 	bool operator!() const;
-	friend bool operator<(Type const& gauche, Type const& droit);
-	friend bool operator>(Type const& gauche, Type const& droit);
-	Type &operator=(const Type& autre);
+	friend bool operator<(Type const* gauche, Type const droit);
+	friend bool operator>(Type const* gauche, Type const droit);
 	friend ostream &operator<<(ostream &os, const Type &type);
 
     Type();
     Type(string id);
     ~Type();
 
-	bool possede(const char* argument) const;
+	bool possede(const string argument) const;
 
 	private:
 		void afficher(ostream &os) const;
@@ -28,7 +27,7 @@ public:
 };
 
 Type::Type()
-        : identificateur(NULL), idCollection(0)
+        : identificateur(""), idCollection(0)
 {
 }
 
@@ -53,16 +52,16 @@ bool Type::operator!() const
 	return identificateur == "";
 }
 
-bool Type::possede(const char* argument) const
+bool Type::possede(const string argument) const
 {
 	if(find(idCollection.begin(), idCollection.end(), argument)!=idCollection.end())
 		return true;
 	return false;
 }
 
-bool operator<(Type const& gauche, Type const& droit) 
+bool operator<(Type const* gauche, Type const droit) 
 {
-    return gauche.plusPetit(droit); 
+    return gauche->plusPetit(droit); 
 }
 
 bool Type::plusPetit(Type const& droit) const
@@ -73,9 +72,9 @@ bool Type::plusPetit(Type const& droit) const
     	return false;
 }
 
-bool operator>(Type const& gauche, Type const& droit)
+bool operator>(Type const* gauche, Type const droit)
 {
-    return gauche.plusGrand(droit); 
+    return gauche->plusGrand(droit); 
 }
 
 bool Type::plusGrand(Type const& droit) const
@@ -84,13 +83,6 @@ bool Type::plusGrand(Type const& droit) const
         return true;
     }
     return false;
-}
-
-Type &Type::operator=(const Type& autre) 
-{
-        identificateur = autre.identificateur;
-        idCollection = autre.idCollection;
-        return *this;
 }
 
 ostream &operator<<(ostream &os, const Type& type)

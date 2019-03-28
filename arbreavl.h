@@ -150,7 +150,7 @@ bool ArbreAVL<T>::inserer(Noeud *&noeud, const T &element)
         noeud = new Noeud(element);
         return true;
     }
-    if (element < noeud->contenu)
+    if (&element < noeud->contenu)
     {
         if (inserer(noeud->gauche, element))
         {
@@ -166,7 +166,7 @@ bool ArbreAVL<T>::inserer(Noeud *&noeud, const T &element)
         }
         return false;
     }
-    else if (noeud->contenu < element)
+    else if (&element > noeud->contenu)
     {
         if (inserer(noeud->droite, element))
         {
@@ -344,12 +344,12 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercher(const T &e) const
 
     while (n)
     {
-        if (e < n->contenu)
+        if (&e < n->contenu)
         {
             iter.chemin.empiler(n);
             n = n->gauche;
         }
-        else if (e > n->contenu)
+        else if (&e > n->contenu)
             n = n->droite;
         else
         {
