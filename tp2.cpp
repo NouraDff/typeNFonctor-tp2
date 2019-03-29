@@ -54,7 +54,6 @@ void lecture(ifstream &fichier)
 				while (fichier.peek() == '(')
 				{
 					getline(fichier, ligne);
-					lectureTypesFonc(ligne, vecT);
 					lectureClausesFonc(ligne, fonc, vecT);
 				}
 				vider(&vecT);
@@ -168,6 +167,7 @@ int main(int argc, const char **argv)
 				strcpy(temp, (char *)input.c_str());
 				//Coupe la chaine au ?
 				char *identificateur = strtok(temp, "?(");
+				delete [] temp;
 				Fonctor fonctor = Fonctor(identificateur);
 				Type type = Type(identificateur);
 				if (input.at(found) == '?')
@@ -190,19 +190,9 @@ int main(int argc, const char **argv)
 					//elm contient la string entre parenthèrse
 					string elm = input.substr(found, input.find(')'));
 					vector<string> elmFonctor;
-					size_t start = 0, end = 0;
 
-					char *clause = new char[elm.length()];
-					clause = (char *)elm.c_str();
-					clause = strtok(clause, "( ,)");
-					elmFonctor.push_back(clause);
-					//Met les éléments dans vecteur
-					while (clause != NULL)
-					{
-						clause = strtok(NULL, "(), )");
-						if (clause != NULL)
-							elmFonctor.push_back(clause);
-					}
+					for (char *p = strtok((char *)elm.c_str(), "( ,)"); p != NULL; p = strtok(NULL, "( ,)"))
+						elmFonctor.push_back(p);
 
 					//Itérateur positionner au ?
 					vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
