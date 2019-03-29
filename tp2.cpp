@@ -11,19 +11,119 @@
 
 using namespace std;
 
-void lectureType()
-{
+static ArbreAVL<Type> arbreT = ArbreAVL<Type>();
+static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
 
+void lecture(ifstream);
+void lectureArgumentsType(string, vector<string>&);
+void lectureTypesFonc(string, vector<Type>&);
+void lectureClausesFonc(string, vector<vector<string>>&, vector<Type>);
+bool estEnLettres(const char*);
+template <class T>
+void vider(vector<T>*);
+void operator<<(ostream&, const string);
+
+void lecture(ifstream fichier)
+{
+	Type type;
+	Fonctor tempF;
+	vector<string> clause,  arguments;
+	vector<Type> vecT;
+	vector<vector<string>> fonc;
+	string entree, nom, ligne;
+
+	while (fichier >> entree >> nom)
+	{
+		type = Type(nom);
+		tempF = Fonctor(nom);
+		if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(type) && !arbreF.contient(tempF))
+		{
+			if (!entree.compare("type"))
+			{
+				getline(fichier, ligne);
+				lectureArgumentsType(ligne, arguments);
+				type.idCollection = arguments; // si on enleve vect arguments et que idCollection = lectureType, est-ce qu'on doit supprimer??
+				arbreT.inserer(type);
+				vider(&arguments);
+			}
+			else if (!entree.compare("foncteur"))
+			{
+				getline(fichier, ligne);
+				lectureTypesFonc(ligne, vecT);
+				while (fichier.peek() == '(')
+				{
+					getline(fichier, ligne);
+					lectureTypesFonc(ligne, vecT);
+					lectureClausesFonc(ligne, fonc, vecT);
+				}
+				vider(&vecT);
+				tempF.matrice = fonc;
+				arbreF.inserer(tempF);
+				vider(&fonc);
+			}
+			else
+			{
+				cerr << "Le contenu du fichier est invalide.";
+		       	}
+		}else
+		       cerr << "Les noms des types et/ou fonctors ne sont pas tous valides.";
+	}
 }
 
-void lectureFonctor()
+void lectureArgumentsType(string ligne, vector<string> &arguments)
 {
+        for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
+	{
+		arguments.push_back(p);
+		if (!estEnLettres(p))
+			cerr << "Les arguments ne contiennent pas uniquement que des lettres.";
+		if (find(arguments.begin(), arguments.end(), p) == arguments.end())
+			cerr << "Les arguments ne sont pas tous uniques.";
+	}
+}
 
+void lectureTypesFonc(string ligne, vector<Type> &vecT)
+{
+	Type type;
+	for (char *p = strtok((char *)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
+	{
+		type = Type(p);
+		if (!arbreT.contient(type))
+			cerr << "Les arguments ne sont pas tous existants."; 
+		else{
+			type = *(arbreT.rechercher(type));
+			vecT.push_back(type);
+		}
+	}
+}
+
+void lectureClausesFonc(string ligne, vector<vector<string>> &fonc, vector<Type> type)
+{
+	vector<string> clause;
+	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
+	{
+		clause.push_back(p);
+		if (clause.size() > type.size())
+			break;
+		else if (!type.at(clause.size() - 1).possede(clause.back()))
+			cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus."; 
+	}
+	if (clause.size() != type.size())
+		cerr << "Le format des clauses est invalide.";
+
+	fonc.push_back(clause);
+	vider(&clause);
 }
 
 void lectureRequetes()
 {
 
+}
+
+template <class T>
+void ajout(ArbreAVL<T> arbre)
+{
+	//iserer et clean...
 }
 
 bool estEnLettres(const char *id)
@@ -41,96 +141,20 @@ void vider(vector<T> *vect)
 	vect->shrink_to_fit();
 }
 
-int main(int argc, const char **argv) // enlever méthodes [] et rechercheElement	
+void operator<<(ostream &os, const string err)
+{
+	os << err << endl;
+	exit(1); // s'assurer tt var delete (ex: les vecteurs) et que fichier est close??
+}
+
+int main(int argc, const char **argv) 	
 {
 	ifstream fichier(argv[1], ios::in);
 
 	if (fichier)
 	{
-
-		ArbreAVL<Type> arbreT = ArbreAVL<Type>();
-		ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
-		Type tempT;
-		Fonctor tempF;
-		vector<string> arguments, clause;
-		vector<Type> type;
-		vector<vector<string>> fonc;
-		string entree, nom, ligne;
-
-		while (fichier >> entree >> nom)
-		{
-			tempT = Type(nom); // slm mettre sans new et enlever *
-			tempF = Fonctor(nom);
-			if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(tempT) && !arbreF.contient(tempF))
-			{
-				if (!entree.compare("type"))
-				{
-
-					getline(fichier, ligne);
-					for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
-					{
-						arguments.push_back(p);
-						if (!estEnLettres(p))
-							cerr << "Les arguments ne contiennent pas uniquement que des lettres." << endl; // arrêt??
-						if (find(arguments.begin(), arguments.end(), p) == arguments.end())
-							cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
-					}
-
-					tempT.idCollection = arguments;
-					arbreT.inserer(tempT);
-					vider(&arguments);
-				}
-				else if (!entree.compare("foncteur"))
-				{
-
-					getline(fichier, ligne);
-					for (char *p = strtok((char *)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
-					{
-						tempT = Type(p);
-						if (!arbreT.contient(tempT))
-							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
-						else
-						{
-							tempT = *(arbreT.rechercher(tempT)); 
-							type.push_back(tempT);
-						}
-					}
-
-					while (fichier.peek() == '(')
-					{
-						getline(fichier, ligne);
-						for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
-						{
-							clause.push_back(p);
-							if (clause.size() > type.size())
-							{
-								// arrêt??
-							}
-							else if (!type.at(clause.size() - 1).possede(clause.back()))
-								cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
-						}
-						if (clause.size() != type.size())
-							cerr << "Le format des clauses est invalide." << endl; // arrêt??
-
-						fonc.push_back(clause);
-						vider(&clause);
-					}
-
-					vider(&type);
-					tempF.matrice = fonc;
-					arbreF.inserer(tempF);
-					vider(&fonc);
-				}
-				else
-				{
-					cerr << "Entrée invalide." << endl; // arrêt??
-					break;
-				}
-			} //else objet de même nom existe déjà ou nom n'est pas alphabéthque ou correspond à mots réservés
-		}
-
+		lecture(fichier);
 		fichier.close();
-
 		/*--------------------------------------------------------
 	 	*
 	 	* Lecture Clavier
@@ -240,7 +264,7 @@ int main(int argc, const char **argv) // enlever méthodes [] et rechercheElemen
 	}
 	else
 	{
-		cerr << "Impossible d'ouvrir le fichier." << endl;
+		cerr << "Impossible d'ouvrir le fichier.";
 	}
 
 	return 0;
