@@ -22,16 +22,17 @@ class Fonctor
     bool plusPetit(Fonctor const& droit) const;
 };
 
+// Constructeur sans argument
 Fonctor::Fonctor()
-    : identificateur(""), matrice(0)
-{
-}
+    : identificateur(""), matrice(0){}
 
+// Constructeur
 Fonctor::Fonctor(string id)
 {
     identificateur = id;
 }
 
+// Destructeur
 Fonctor::~Fonctor()
 {
     matrice.clear();
@@ -42,6 +43,12 @@ bool operator<(Fonctor const* gauche, Fonctor const droit)
 	return gauche->plusPetit(droit);
 }
 
+/*
+   Vérifie que l'identificateur du fonctor est plus petit que le droit
+   
+    @params droit: fonctor à comparer
+    @return vrai si l'identificatuer est plus petit que celui du fonctor droit, sinon faux. 
+*/
 bool Fonctor::plusPetit(Fonctor const& droit) const
 {
     if (identificateur < droit.identificateur)
@@ -56,6 +63,12 @@ bool operator>(Fonctor const* gauche, Fonctor const droit)
 	return gauche->plusGrand(droit);
 }
 
+/*
+   Vérifiqe que l'identificateur du fonctor est plus grand que celui du fonctor droit
+   
+    @params droit: fonctor à comparer. 
+    @return vrai si l'identificateur du fonctor est plus grand que celui du droit, sinon faux. 
+*/
 bool Fonctor::plusGrand(Fonctor const& droit) const
 {
     if (identificateur > droit.identificateur)
@@ -65,12 +78,24 @@ bool Fonctor::plusGrand(Fonctor const& droit) const
     return false;
 }
 
+/*
+    Surcharge l'opérateur de sortie pour afficher le contenu du fonctor. 
+   
+    @params os: flux de sortie
+			type: élement à afficher
+    @return le flux de sortie ostream
+*/
 ostream &operator<<(ostream &os, const Fonctor &fonctor)
 {
     fonctor.afficher(os);
     return os;
 }
 
+/*
+   Affiche toutes les clauses du fonctor. 
+   
+    @params os: flux de sortie
+*/
 void Fonctor::afficher(ostream &os) const
 {
     for (int i = 0; i < matrice.size(); i++)
