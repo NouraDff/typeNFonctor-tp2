@@ -11,6 +11,21 @@
 
 using namespace std;
 
+void lectureType()
+{
+
+}
+
+void lectureFonctor()
+{
+
+}
+
+void lectureRequetes()
+{
+
+}
+
 bool estEnLettres(const char *id)
 {
 	for (unsigned i = 0; i < strlen(id); ++i)
