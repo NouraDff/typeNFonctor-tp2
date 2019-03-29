@@ -80,6 +80,10 @@ class ArbreAVL
 
         friend class ArbreAVL;
     };
+
+    // Accès aux éléments de l'arbre via un itérateur.
+    const T &operator[](const Iterateur &) const;
+    T &operator[](const Iterateur &);
 };
 
 //-----------------------------------------------------------------------------
