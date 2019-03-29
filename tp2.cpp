@@ -14,7 +14,7 @@ using namespace std;
 static ArbreAVL<Type> arbreT = ArbreAVL<Type>();
 static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
 
-void lecture(ifstream);
+void lecture(ifstream&);
 void lectureArgumentsType(string, vector<string>&);
 void lectureTypesFonc(string, vector<Type>&);
 void lectureClausesFonc(string, vector<vector<string>>&, vector<Type>);
@@ -22,9 +22,9 @@ void lectureRequetes();
 bool estEnLettres(const char*);
 template <class T>
 void vider(vector<T>*);
-void operator<<(ostream&, const string);
+void erreur(const string);
 
-void lecture(ifstream fichier)
+void lecture(ifstream &fichier)
 {
 	Type type;
 	Fonctor tempF;
@@ -64,10 +64,10 @@ void lecture(ifstream fichier)
 			}
 			else
 			{
-				cerr << "Le contenu du fichier est invalide.";
+				erreur("Le contenu du fichier est invalide.");
 		       	}
 		}else
-		       cerr << "Les noms des types et/ou fonctors ne sont pas tous valides.";
+		       erreur("Les noms des types et/ou fonctors ne sont pas tous valides.");
 	}
 	fichier.close();
 }
@@ -78,9 +78,9 @@ void lectureArgumentsType(string ligne, vector<string> &arguments)
 	{
 		arguments.push_back(p);
 		if (!estEnLettres(p))
-			cerr << "Les arguments ne contiennent pas uniquement que des lettres.";
+			erreur("Les arguments ne contiennent pas uniquement que des lettres.");
 		if (find(arguments.begin(), arguments.end(), p) == arguments.end())
-			cerr << "Les arguments ne sont pas tous uniques.";
+			erreur("Les arguments ne sont pas tous uniques.");
 	}
 }
 
@@ -91,7 +91,7 @@ void lectureTypesFonc(string ligne, vector<Type> &vecT)
 	{
 		type = Type(p);
 		if (!arbreT.contient(type))
-			cerr << "Les arguments ne sont pas tous existants."; 
+			erreur("Les arguments ne sont pas tous existants."); 
 		else{
 			type = *(arbreT.rechercher(type));
 			vecT.push_back(type);
@@ -108,10 +108,10 @@ void lectureClausesFonc(string ligne, vector<vector<string>> &fonc, vector<Type>
 		if (clause.size() > type.size())
 			break;
 		else if (!type.at(clause.size() - 1).possede(clause.back()))
-			cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus."; 
+			erreur("Les arguments des clauses ne correspondent pas tous aux types voulus."); 
 	}
 	if (clause.size() != type.size())
-		cerr << "Le format des clauses est invalide.";
+		erreur("Le format des clauses est invalide.");
 
 	fonc.push_back(clause);
 	vider(&clause);
