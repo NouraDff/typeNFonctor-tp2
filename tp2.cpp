@@ -26,7 +26,7 @@ void vider(vector<T>* vect)
 	vect->shrink_to_fit();
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char **argv) // enlever méthodes [] et rechercheElement	
 {
 	ifstream fichier(argv[1], ios::in);
 
@@ -44,7 +44,7 @@ int main(int argc, const char **argv)
 
 		while (fichier >> entree >> nom)
 		{
-			tempT = new Type(nom);
+			tempT = new Type(nom); // slm mettre sans new et enlever *
 			tempF = new Fonctor(nom);
 			if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT->contient(*tempT) && !arbreF->contient(*tempF))
 			{
@@ -76,7 +76,7 @@ int main(int argc, const char **argv)
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
 						else
 						{
-							*tempT = arbreT->rechercheElement(*tempT); 
+							*tempT = *(arbreT->rechercher(*tempT)); 
 							type.push_back(tempT);
 						}
 					}

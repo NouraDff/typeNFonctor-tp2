@@ -37,10 +37,6 @@ class ArbreAVL
     Iterateur rechercherEgalOuSuivant(const T &) const;
     Iterateur rechercherEgalOuPrecedent(const T &) const;
 
-    // Accès aux éléments de l'arbre via un itérateur.
-    const T &operator[](const Iterateur &) const;
-    T &operator[](const Iterateur &);
-
     // Copie d'un arbre AVL.
     ArbreAVL &operator=(const ArbreAVL &);
 
@@ -91,6 +87,10 @@ class ArbreAVL
 
         friend class ArbreAVL;
     };
+
+    // Accès aux éléments de l'arbre via un itérateur.
+    const T &operator[](const Iterateur &) const;
+    T &operator[](const Iterateur &);
 };
 
 //-----------------------------------------------------------------------------
