@@ -76,7 +76,7 @@ int main(int argc, const char **argv)
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
 						else
 						{
-							*tempT = *(arbreT->rechercher(*tempT)); //arbreT->rechercheElement(*tempT);
+							*tempT = *(arbreT->rechercher(*tempT)); 
 							type.push_back(tempT);
 						}
 					}
@@ -140,11 +140,11 @@ int main(int argc, const char **argv)
 				{
 					if (arbreF->contient(*fonctor))
 					{
-						cout << arbreF->rechercheElement(*fonctor);
+						cout << *(arbreF->rechercher(*fonctor));
 					}
 					else if (arbreT->contient(*type))
 					{
-						cout << arbreT->rechercheElement(*type);
+						cout << *(arbreT->rechercher(*type));
 					}
 					else
 					{
@@ -179,7 +179,7 @@ int main(int argc, const char **argv)
 						index = distance(elmFonctor.begin(), it);
 						if (arbreF->contient(*fonctor))
 						{
-							*fonctor = arbreF->rechercheElement(*fonctor);
+							*fonctor = *(arbreF->rechercher(*fonctor));
 							cout << "{";
 							string sep = "";
 							for (int i = 0; i < fonctor->matrice.size(); i++)
