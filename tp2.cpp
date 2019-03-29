@@ -18,6 +18,7 @@ void lecture(ifstream);
 void lectureArgumentsType(string, vector<string>&);
 void lectureTypesFonc(string, vector<Type>&);
 void lectureClausesFonc(string, vector<vector<string>>&, vector<Type>);
+void lectureRequetes();
 bool estEnLettres(const char*);
 template <class T>
 void vider(vector<T>*);
@@ -68,6 +69,7 @@ void lecture(ifstream fichier)
 		}else
 		       cerr << "Les noms des types et/ou fonctors ne sont pas tous valides.";
 	}
+	fichier.close();
 }
 
 void lectureArgumentsType(string ligne, vector<string> &arguments)
@@ -120,12 +122,6 @@ void lectureRequetes()
 
 }
 
-template <class T>
-void ajout(ArbreAVL<T> arbre)
-{
-	//iserer et clean...
-}
-
 bool estEnLettres(const char *id)
 {
 	for (unsigned i = 0; i < strlen(id); ++i)
@@ -141,9 +137,9 @@ void vider(vector<T> *vect)
 	vect->shrink_to_fit();
 }
 
-void operator<<(ostream &os, const string err)
+void erreur(const string err)
 {
-	os << err << endl;
+	cerr << err << endl;
 	exit(1); // s'assurer tt var delete (ex: les vecteurs) et que fichier est close??
 }
 
@@ -154,7 +150,6 @@ int main(int argc, const char **argv)
 	if (fichier)
 	{
 		lecture(fichier);
-		fichier.close();
 		/*--------------------------------------------------------
 	 	*
 	 	* Lecture Clavier
