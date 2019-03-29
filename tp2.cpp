@@ -20,7 +20,7 @@ bool estEnLettres(const char *id)
 }
 
 template <class T>
-void vider(vector<T>* vect)
+void vider(vector<T> *vect)
 {
 	vect->clear();
 	vect->shrink_to_fit();
@@ -33,67 +33,68 @@ int main(int argc, const char **argv) // enlever méthodes [] et rechercheElemen
 	if (fichier)
 	{
 
-		ArbreAVL<Type> *arbreT = new ArbreAVL<Type>();
-		ArbreAVL<Fonctor> *arbreF = new ArbreAVL<Fonctor>();
-		Type *tempT;
-		Fonctor *tempF;
+		ArbreAVL<Type> arbreT = ArbreAVL<Type>();
+		ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
+		Type tempT;
+		Fonctor tempF;
 		vector<string> arguments, clause;
-		vector<Type *> type;
+		vector<Type> type;
 		vector<vector<string>> fonc;
 		string entree, nom, ligne;
 
 		while (fichier >> entree >> nom)
 		{
-			tempT = new Type(nom); // slm mettre sans new et enlever *
-			tempF = new Fonctor(nom);
-			if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT->contient(*tempT) && !arbreF->contient(*tempF))
+			tempT = Type(nom); // slm mettre sans new et enlever *
+			tempF = Fonctor(nom);
+			if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(tempT) && !arbreF.contient(tempF))
 			{
 				if (!entree.compare("type"))
 				{
 
 					getline(fichier, ligne);
-					for (char *p = strtok((char*)ligne.c_str(), "= {,"); p != NULL; p = strtok(NULL, " ,}"))
+					for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
 					{
-						arguments.push_back( p );
-						if(!estEnLettres(p))
+						arguments.push_back(p);
+						if (!estEnLettres(p))
 							cerr << "Les arguments ne contiennent pas uniquement que des lettres." << endl; // arrêt??
-						if(find(arguments.begin(), arguments.end(), p) == arguments.end())
+						if (find(arguments.begin(), arguments.end(), p) == arguments.end())
 							cerr << "Les arguments ne sont pas tous uniques." << endl; // arrêt??
 					}
 
-					tempT->idCollection = arguments;
-					arbreT->inserer(*tempT);
+					tempT.idCollection = arguments;
+					arbreT.inserer(tempT);
 					vider(&arguments);
 				}
 				else if (!entree.compare("foncteur"))
 				{
 
 					getline(fichier, ligne);
-					for(char *p = strtok((char*)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
-					{	
-						tempT = new Type(p);
-						if (!arbreT->contient(*tempT))
+					for (char *p = strtok((char *)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
+					{
+						tempT = Type(p);
+						if (!arbreT.contient(tempT))
 							cerr << "Les arguments ne sont pas tous existants." << endl; // arrêt
 						else
 						{
-							*tempT = *(arbreT->rechercher(*tempT)); 
+							tempT = *(arbreT.rechercher(tempT)); 
 							type.push_back(tempT);
 						}
 					}
 
-
 					while (fichier.peek() == '(')
 					{
 						getline(fichier, ligne);
-						for(char *p = strtok((char *)ligne.c_str(), "( ,"); p != NULL; p = strtok(NULL, " ,)"))
+						for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
 						{
 							clause.push_back(p);
-							if(clause.size() > type.size()){
+							if (clause.size() > type.size())
+							{
 								// arrêt??
-							}else if(!type.at(clause.size() - 1)->possede(clause.back()))
+							}
+							else if (!type.at(clause.size() - 1).possede(clause.back()))
 								cerr << "Les arguments des clauses ne correspondent pas tous aux types voulus." << endl; // arrêt??
 						}
-						if(clause.size() != type.size())
+						if (clause.size() != type.size())
 							cerr << "Le format des clauses est invalide." << endl; // arrêt??
 
 						fonc.push_back(clause);
@@ -101,8 +102,8 @@ int main(int argc, const char **argv) // enlever méthodes [] et rechercheElemen
 					}
 
 					vider(&type);
-					tempF->matrice = fonc;
-					arbreF->inserer(*tempF);
+					tempF.matrice = fonc;
+					arbreF.inserer(tempF);
 					vider(&fonc);
 				}
 				else
@@ -132,18 +133,18 @@ int main(int argc, const char **argv) // enlever méthodes [] et rechercheElemen
 				char *temp = new char[input.length()];
 				strcpy(temp, (char *)input.c_str());
 				//Coupe la chaine au ?
-				char *identificateur = strtok(temp, &input.at(found));
-				Fonctor *fonctor = new Fonctor(identificateur);
-				Type *type = new Type(identificateur);
+				char *identificateur = strtok(temp, "?(");
+				Fonctor fonctor = Fonctor(identificateur);
+				Type type = Type(identificateur);
 				if (input.at(found) == '?')
 				{
-					if (arbreF->contient(*fonctor))
+					if (arbreF.contient(fonctor))
 					{
-						cout << arbreF->rechercheElement(*fonctor) << endl;
+						cout << *(arbreF.rechercher(fonctor));
 					}
-					else if (arbreT->contient(*type))
+					else if (arbreT.contient(type))
 					{
-						cout << arbreT->rechercheElement(*type) << endl;
+						cout << *(arbreT.rechercher(type));
 					}
 					else
 					{
@@ -159,12 +160,12 @@ int main(int argc, const char **argv) // enlever méthodes [] et rechercheElemen
 
 					char *clause = new char[elm.length()];
 					clause = (char *)elm.c_str();
-					clause = strtok(clause, "( ,");
+					clause = strtok(clause, "( ,)");
 					elmFonctor.push_back(clause);
 					//Met les éléments dans vecteur
 					while (clause != NULL)
 					{
-						clause = strtok(NULL, ", )");
+						clause = strtok(NULL, "(), )");
 						if (clause != NULL)
 							elmFonctor.push_back(clause);
 					}
@@ -176,37 +177,43 @@ int main(int argc, const char **argv) // enlever méthodes [] et rechercheElemen
 					if (it != elmFonctor.end())
 					{
 						index = distance(elmFonctor.begin(), it);
-						if (arbreF->contient(*fonctor))
+						if (arbreF.contient(fonctor))
 						{
-							*fonctor = arbreF->rechercheElement(*fonctor);
+							fonctor = *(arbreF.rechercher(fonctor));
 							cout << "{";
 							string sep = "";
-							for (int i = 0; i < fonctor->matrice.size(); i++)
+							for (int i = 0; i < fonctor.matrice.size(); i++)
 							{
-								if (it == elmFonctor.begin())
+								if (elmFonctor.size() == 1)
 								{
-									sousClause1 = equal(fonctor->matrice[i].begin() + 1, fonctor->matrice[i].end(), it + 1);
+									sousClause1 = true;
 									sousClause2 = true;
 								}
-								else if (it == elmFonctor.end()-1)
+								if (it == elmFonctor.begin())
 								{
-									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin()+ index, elmFonctor.begin() );
-									sousClause2 = true; 
+									sousClause1 = equal(fonctor.matrice[i].begin() + 1, fonctor.matrice[i].end(), it + 1);
+									sousClause2 = true;
+								}
+								else if (it == elmFonctor.end() - 1)
+								{
+									sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
+									sousClause2 = true;
 								}
 								else
 								{
-									sousClause1 = equal(fonctor->matrice[i].begin(), fonctor->matrice[i].begin() + index, elmFonctor.begin() );
-									sousClause2 = equal(fonctor->matrice[i].begin() + index + 1, fonctor->matrice[i].end(), it + 1);
+									sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
+									sousClause2 = equal(fonctor.matrice[i].begin() + index + 1, fonctor.matrice[i].end(), it + 1);
 								}
 
 								if (sousClause1 && sousClause2)
 								{
-									cout << sep << *(fonctor->matrice[i].begin() + index);
+									cout << sep << *(fonctor.matrice[i].begin() + index);
 									sep = ", ";
 								}
+								
 							}
+							cout << "}" << endl;
 						}
-						cout << "}" << endl;
 					}
 					else
 					{
