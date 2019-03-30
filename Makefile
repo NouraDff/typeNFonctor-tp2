@@ -1,20 +1,15 @@
 # Makefile
 
-CARGS= -lm -std=c++11 -g
+CARGS= -lm -O2 -std=c++11 -g
 DATE = $(shell date +Modif:\ %a\ %-d\ %b\ %Y\ à\ %T)
-.PHONY: all default testavl clean save
+.PHONY: default tp2 clean save
 
-all : testavl tp2 
-
-default: tp2 arbreavl.h type.h fonctor.h
-tp2: tp2.cpp arbreavl.h type.h fonctor.h
-	@g++ -o $@ $< $(CARGS)
-
-test: testavl.cpp arbreavl.h
+default: tp2 
+tp2: tp2.cpp arbreavl.h type.h fonctor.h pile.h
 	@g++ -o $@ $< $(CARGS)
 
 clean :
-	@rm -f testavl tp2
+	@rm -f tp2 
 
 save:
 	@git commit -q -am "$(DATE)"	
