@@ -25,8 +25,8 @@ void lectureBaseConnaissances(ifstream &);
 /*
    Lit l'entrée vérifie que les types entrés sont uniques. 
    
-    @params 
-    @return 
+    @params ligne : entrée à lire
+    @return vecteur contenant
 */
 vector<string> lectureArgumentsType(string ligne);
 
@@ -34,10 +34,10 @@ vector<string> lectureArgumentsType(string ligne);
     Met dans un vecteur la liste des types que contiennent les clauses du fonctor
 	et vérifie que le nombre de type correspond au nombre d'élément dans une clause. 
    
-    @params 
-    @return 
+    @params ligne: ligne contenant l'entrée à lire
+    @return un vecteur contenant les types
 */
-vector<Type> lectureTypesFonc(string);
+vector<Type> lectureTypesFonc(string ligne);
 
 /*
    Permet de vérifier pour chaque élément si le type dans la clause
@@ -47,7 +47,13 @@ vector<Type> lectureTypesFonc(string);
 			type: vecteur contenant les types
     @return 
 */
-vector<string> lectureClausesFonc(string,  vector<Type>);
+vector<string> lectureClausesFonc(string ligne, vector<Type> type);
+
+void traiterRequeteClauses(string input);
+
+void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFonctor);
+
+void afficherCollectionRequete(string input);
 
 /*
    
@@ -80,8 +86,6 @@ void vider(vector<T> *vect);
 */
 void erreur(const string);
 
-
-
 int main(int argc, const char **argv)
 {
 	ifstream fichier(argv[1], ios::in);
@@ -90,17 +94,9 @@ int main(int argc, const char **argv)
 	{
 		lectureBaseConnaissances(fichier);
 		lectureRequetes();
-
-		/*--------------------------------------------------------
-	 	*
-	 	* Lecture Clavier
-	 	*
-	 	* -------------------------------------------------------*/
 	}
 	else
-	{
 		cerr << "Impossible d'ouvrir le fichier.";
-	}
 
 	return 0;
 }
@@ -195,65 +191,75 @@ vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 	return clause;
 }
 
+void traiterRequeteClauses(string input)
+{
+	char *identificateur = strtok((char *)input.c_str(), "(");
+	Fonctor fonctor = Fonctor(identificateur);
+	//Itérateur positionner au ?
+	if (arbreF.contient(fonctor))
+	{
+		fonctor = *(arbreF.rechercher(fonctor));
+		vector<string> elmFonctor;
+
+		//elm contient la string entre parenthèrse
+		for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
+			elmFonctor.push_back(p);
+		
+		validerRequeteClauses(fonctor.matrice, elmFonctor);
+	}else
+		erreur("Le fonctor n'existe pas.");
+}
+
+void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFonctor)
+{
+	vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
+	cout << "{";
+	string sep = "";
+	for (unsigned i = 0; i < matrice.size(); ++i)
+	{
+		vector<string>::iterator index = matrice[i].begin() + distance(elmFonctor.begin(), it);
+			bool sousClause1 = true, sousClause2 = true;
+			if (it != elmFonctor.end() - 1)
+				sousClause2 = equal(index + 1, matrice[i].end(), it + 1);
+			if (it != elmFonctor.begin())
+				sousClause1 = equal(matrice[i].begin(), index, elmFonctor.begin());
+			if (sousClause1 && sousClause2)
+			{
+				cout << sep << *(index);
+				sep = ", ";
+			}
+	}
+	cout << "}" << endl;
+}
+
+void afficherCollectionRequete(string input)
+{
+	char *identificateur = strtok((char *)input.c_str(), "?(");
+	Fonctor fonctor = Fonctor(identificateur);
+	Type type = Type(identificateur);
+	if (arbreF.contient(fonctor))
+		cout << *(arbreF.rechercher(fonctor));
+	else if (arbreT.contient(type))
+		cout << *(arbreT.rechercher(type));
+	else
+		erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
+}
+
 void lectureRequetes()
 {
-		string input;
-		while (getline(cin, input) && !cin.eof())
-		{
-				if (input.find_first_of("?") != string::npos)
-				{
-					char *identificateur = strtok((char*)input.c_str(), "?(");
-		                        Fonctor fonctor = Fonctor(identificateur);
-					Type type = Type(identificateur);	
-					if (arbreF.contient(fonctor))
-						cout << *(arbreF.rechercher(fonctor));
-					else if (arbreT.contient(type))
-						cout << *(arbreT.rechercher(type));
-					else
-						erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
-				}
-				else if (input.find_first_of("(") != string::npos)
-				{
-					char *identificateur = strtok((char*)input.c_str(), "?(");
-					Fonctor fonctor = Fonctor(identificateur);
-					//elm contient la string entre parenthèrse
-					vector<string> elmFonctor;
-
-					for (char *p = strtok((char *)input.c_str(), " ,)"); p != NULL; p = strtok(NULL, " ,)"))
-						elmFonctor.push_back(p);
-
-					//Itérateur positionner au ?
-					vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
-					if (it != elmFonctor.end())
-					{
-						if (arbreF.contient(fonctor))
-						{
-							fonctor = *(arbreF.rechercher(fonctor));
-							vector<vector<string>>::iterator index = fonctor.matrice[distance(elmFonctor.begin(), it)];
-							cout << "{";
-							string sep = "";
-							for (unsigned i = 0; i < fonctor.matrice.size(); ++i)
-							{
-								bool sousClause1 = true, sousClause2 = true;
-								if (it != elmFonctor.end()-1)
-									sousClause2 = equal(index + 1, fonctor.matrice[i].end(), it + 1);
-								if (it != elmFonctor.begin())
-									sousClause1 = equal(fonctor.matrice[i].begin(), index, elmFonctor.begin());
-
-								if (sousClause1 && sousClause2)
-								{
-									cout << sep << *(index);
-									sep = ", ";
-								}
-							}
-							cout << "}" << endl;
-						}else
-							erreur("Le fonctor n'existe pas.");
-					}
-					else
-						erreur("Le format de la requête est invalide.");
-				}
-		}
+	string input;
+	while (getline(cin, input) && !cin.eof())
+	{
+		size_t found = input.find_first_of("?(");
+		//Si la position du caractère doit ce trouver dans la chaine de catactère
+		if (found < input.length() && found > 0)
+			if (input.find_first_of("(") != string::npos)
+				traiterRequeteClauses(input);
+			else if (input.find_first_of("?") != string::npos)
+				afficherCollectionRequete(input);
+		else
+			erreur("Le format de la requête est invalide. ");
+	}
 }
 
 bool estEnLettres(const char *id)
@@ -274,5 +280,5 @@ void vider(vector<T> *vect)
 void erreur(const string err)
 {
 	cerr << err << endl;
-	exit(1); // s'assurer tt var delete (ex: les vecteurs) et que fichier est close??
+	exit(1); 
 }
