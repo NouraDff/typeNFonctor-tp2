@@ -7,14 +7,14 @@ DATE = $(shell date +Modif:\ %a\ %-d\ %b\ %Y\ à\ %T)
 all : testavl tp2 
 
 default: tp2 arbreavl.h type.h fonctor.h
-tp2:
-	@g++ -o $@ tp2.cpp $(CARGS)
+tp2: tp2.cpp arbreavl.h type.h fonctor.h
+	@g++ -o $@ $< $(CARGS)
 
 test: testavl.cpp arbreavl.h
-	@g++ -o testavl testavl.cpp $(CARGS)
+	@g++ -o $@ $< $(CARGS)
 
 clean :
-	@rm -f testavl a.out
+	@rm -f testavl tp2
 
 save:
 	@git commit -q -am "$(DATE)"	
