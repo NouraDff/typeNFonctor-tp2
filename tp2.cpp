@@ -20,7 +20,7 @@ static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
     @params 
     @return 
 */
-void lecture(ifstream &);
+void lectureBaseConnaissances(ifstream &);
 
 /*
    Lit l'entrée vérifie que les types entrés sont uniques. 
@@ -28,7 +28,7 @@ void lecture(ifstream &);
     @params 
     @return 
 */
-void lectureArgumentsType(string, vector<string> &);
+vector<string> lectureArgumentsType(string ligne);
 
 /*
     Met dans un vecteur la liste des types que contiennent les clauses du fonctor
@@ -37,18 +37,17 @@ void lectureArgumentsType(string, vector<string> &);
     @params 
     @return 
 */
-void lectureTypesFonc(string, vector<Type> &);
+vector<Type> lectureTypesFonc(string);
 
 /*
    Permet de vérifier pour chaque élément si le type dans la clause
    existe puis l'insère dans dans le tableau de vector fonc. 
    
     @params ligne: ligne contenant l'entrée à lire
-			fonc: matrice contenant les clauses
 			type: vecteur contenant les types
     @return 
 */
-void lectureClausesFonc(string ligne, vector<vector<string>> &fonc, vector<Type> type);
+vector<string> lectureClausesFonc(string,  vector<Type>);
 
 /*
    
@@ -89,13 +88,115 @@ int main(int argc, const char **argv)
 
 	if (fichier)
 	{
-		lecture(fichier);
+		lectureBaseConnaissances(fichier);
+		lectureRequetes();
+
 		/*--------------------------------------------------------
 	 	*
 	 	* Lecture Clavier
 	 	*
 	 	* -------------------------------------------------------*/
+	}
+	else
+	{
+		cerr << "Impossible d'ouvrir le fichier.";
+	}
 
+	return 0;
+}
+
+void lectureBaseConnaissances(ifstream &fichier)
+{
+	string entree, nom, ligne;
+
+	while (fichier >> entree >> nom)
+	{
+		Type type = Type(nom);
+		Fonctor fonctor = Fonctor(nom);
+		if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(type) && !arbreF.contient(fonctor))
+		{
+			if (!entree.compare("type"))
+			{
+				getline(fichier, ligne);
+				type.idCollection = lectureArgumentsType(ligne);
+				arbreT.inserer(type);
+			}
+			else if (!entree.compare("foncteur"))
+			{
+				getline(fichier, ligne);
+				vector<Type> vecT = lectureTypesFonc(ligne);
+				vector<vector<string>> vecF;
+				while (fichier.peek() == '(')
+				{
+					getline(fichier, ligne);
+					vecF.push_back(lectureClausesFonc(ligne, vecT));
+				}
+				vider(&vecT);
+				fonctor.matrice = vecF;
+				arbreF.inserer(fonctor);
+				vider(&vecF);
+			}
+			else
+				erreur("Le contenu du fichier est invalide.");
+		}
+		else
+			erreur("Les noms des types et/ou fonctors ne sont pas tous valides.");
+	}
+
+	fichier.close();
+}
+
+vector<string> lectureArgumentsType(string ligne)
+{
+	vector<string> arguments;
+	for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
+	{
+		arguments.push_back(p);
+		if (!estEnLettres(p))
+			erreur("Les arguments ne contiennent pas uniquement que des lettres.");
+		if (find(arguments.begin(), arguments.end(), p) == arguments.end())
+			erreur("Les arguments ne sont pas tous uniques.");
+	}
+	return arguments;
+}
+
+vector<Type> lectureTypesFonc(string ligne)
+{
+	Type type;
+	vector<Type> vecT;
+	for (char *p = strtok((char *)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
+	{
+		type = Type(p);
+		if (!arbreT.contient(type))
+			erreur("Les arguments ne sont pas tous existants.");
+		else
+		{
+			type = *(arbreT.rechercher(type));
+			vecT.push_back(type);
+		}
+	}
+	return vecT;
+}
+
+vector<string> lectureClausesFonc(string ligne, vector<Type> type)
+{
+	vector<string> clause;
+	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
+	{
+		clause.push_back(p);
+		if (clause.size() > type.size())
+			break;
+		else if (!type.at(clause.size() - 1).possede(clause.back()))
+			erreur("Les arguments des clauses ne correspondent pas tous aux types voulus.");
+	}
+	if (clause.size() != type.size())
+		erreur("Le format des clauses est invalide.");
+
+	return clause;
+}
+
+void lectureRequetes()
+{
 		string input;
 		while (getline(cin, input) && !cin.eof())
 		{
@@ -187,111 +288,6 @@ int main(int argc, const char **argv)
 				delete[] temp;
 			}
 		}
-	}
-	else
-	{
-		cerr << "Impossible d'ouvrir le fichier.";
-	}
-
-	return 0;
-}
-
-void lecture(ifstream &fichier)
-{
-	Type type;
-	Fonctor tempF;
-	vector<string> clause, arguments;
-	vector<Type> vecT;
-	vector<vector<string>> fonc;
-	string entree, nom, ligne;
-
-	while (fichier >> entree >> nom)
-	{
-		type = Type(nom);
-		tempF = Fonctor(nom);
-		if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(type) && !arbreF.contient(tempF))
-		{
-			if (!entree.compare("type"))
-			{
-				getline(fichier, ligne);
-				lectureArgumentsType(ligne, arguments);
-				type.idCollection = arguments; // si on enleve vect arguments et que idCollection = lectureType, est-ce qu'on doit supprimer??
-				arbreT.inserer(type);
-				vider(&arguments);
-			}
-			else if (!entree.compare("foncteur"))
-			{
-				getline(fichier, ligne);
-				lectureTypesFonc(ligne, vecT);
-				while (fichier.peek() == '(')
-				{
-					getline(fichier, ligne);
-					lectureClausesFonc(ligne, fonc, vecT);
-				}
-				vider(&vecT);
-				tempF.matrice = fonc;
-				arbreF.inserer(tempF);
-				vider(&fonc);
-			}
-			else
-			{
-				erreur("Le contenu du fichier est invalide.");
-			}
-		}
-		else
-			erreur("Les noms des types et/ou fonctors ne sont pas tous valides.");
-	}
-	fichier.close();
-}
-
-void lectureArgumentsType(string ligne, vector<string> &arguments)
-{
-	for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
-	{
-		arguments.push_back(p);
-		if (!estEnLettres(p))
-			erreur("Les arguments ne contiennent pas uniquement que des lettres.");
-		if (find(arguments.begin(), arguments.end(), p) == arguments.end())
-			erreur("Les arguments ne sont pas tous uniques.");
-	}
-}
-
-void lectureTypesFonc(string ligne, vector<Type> &vecT)
-{
-	Type type;
-	for (char *p = strtok((char *)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
-	{
-		type = Type(p);
-		if (!arbreT.contient(type))
-			erreur("Les arguments ne sont pas tous existants.");
-		else
-		{
-			type = *(arbreT.rechercher(type));
-			vecT.push_back(type);
-		}
-	}
-}
-
-void lectureClausesFonc(string ligne, vector<vector<string>> &fonc, vector<Type> type)
-{
-	vector<string> clause;
-	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
-	{
-		clause.push_back(p);
-		if (clause.size() > type.size())
-			break;
-		else if (!type.at(clause.size() - 1).possede(clause.back()))
-			erreur("Les arguments des clauses ne correspondent pas tous aux types voulus.");
-	}
-	if (clause.size() != type.size())
-		erreur("Le format des clauses est invalide.");
-
-	fonc.push_back(clause);
-	vider(&clause);
-}
-
-void lectureRequetes()
-{
 }
 
 bool estEnLettres(const char *id)
