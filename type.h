@@ -11,7 +11,7 @@ class Type
 	operator bool() const;
 	bool operator!() const;
 	friend bool operator<(Type const *gauche, Type const droit);
-	bool operator>(Type const droit) const;
+	friend bool operator>(Type const *gauche, Type const droit);
 	friend ostream &operator<<(ostream &os, const Type &type);
 
 	Type();
@@ -23,7 +23,7 @@ class Type
   private:
 	void afficher(ostream &os) const;
 	bool plusPetit(Type const &droit) const;
-	//bool plusGrand(Type const &droit) const;
+	bool plusGrand(Type const &droit) const;
 };
 
 //Constructeur sans argument
@@ -79,9 +79,9 @@ bool Type::plusPetit(Type const &droit) const
 	return identificateur < droit.identificateur;
 }
 
-bool Type::operator>(Type const droit) const
+bool operator>(Type const *gauche, Type const droit) 
 {
-	return identificateur > droit.identificateur;
+	return gauche->plusGrand(droit);
 }
 
 /*
@@ -90,10 +90,10 @@ bool Type::operator>(Type const droit) const
     @params : type dont on compare l'identificateur
     @return vrai si l'identificateur est plus grand que le type droit. 
 */
-/*bool Type::plusGrand(Type const &droit) const
+bool Type::plusGrand(Type const &droit) const
 {
 	return identificateur > droit.identificateur;
-}*/
+}
 
 /*
     Surcharge l'opérateur de sortie pour afficher le contenu du type. 
