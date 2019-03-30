@@ -40,7 +40,8 @@ Type::Type(string id)
 Type::~Type()
 {
 	identificateur = "";
-    idCollection.clear(); //.shrink_to_fit ? et id = NULL?
+    idCollection.clear();
+	idCollection.shrink_to_fit(); 
 }
 
 Type::operator bool() const
