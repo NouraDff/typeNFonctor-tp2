@@ -14,15 +14,73 @@ using namespace std;
 static ArbreAVL<Type> arbreT = ArbreAVL<Type>();
 static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
 
+/*
+   
+   
+    @params 
+    @return 
+*/
 void lectureBaseConnaissances(ifstream &);
-vector<string> lectureArgumentsType(string);
+
+/*
+   Lit l'entrée vérifie que les types entrés sont uniques. 
+   
+    @params 
+    @return 
+*/
+vector<string> lectureArgumentsType(string ligne);
+
+/*
+    Met dans un vecteur la liste des types que contiennent les clauses du fonctor
+	et vérifie que le nombre de type correspond au nombre d'élément dans une clause. 
+   
+    @params 
+    @return 
+*/
 vector<Type> lectureTypesFonc(string);
-vector<string> lectureClausesFonc(string, vector<Type>);
+
+/*
+   Permet de vérifier pour chaque élément si le type dans la clause
+   existe puis l'insère dans dans le tableau de vector fonc. 
+   
+    @params ligne: ligne contenant l'entrée à lire
+			type: vecteur contenant les types
+    @return 
+*/
+vector<string> lectureClausesFonc(string,  vector<Type>);
+
+/*
+   
+   
+    @params 
+    @return 
+*/
 void lectureRequetes();
-bool estEnLettres(const char *);
+
+/*
+   Vérifie que la chaine de caractère ne contient que des lettres. 
+   
+    @params id: chaine de caratère
+    @return vrai si la chaine ne contient que des lettres, sinon faux. 
+*/
+bool estEnLettres(const char *id);
+
+/*
+	Vide le vecteur 
+   
+    @params vect: vecteur qui sera vider. 
+*/
 template <class T>
-void vider(vector<T> *);
+void vider(vector<T> *vect);
+
+/*
+   Affiche un message d'erreur et quitte le programme avec exit(1) 
+   
+    @params string: Le message d'erreur à afficher
+*/
 void erreur(const string);
+
+
 
 int main(int argc, const char **argv)
 {
@@ -38,98 +96,6 @@ int main(int argc, const char **argv)
 	 	* Lecture Clavier
 	 	*
 	 	* -------------------------------------------------------*/
-
-		string input;
-		while (getline(cin, input) && !cin.eof())
-		{
-			size_t found = input.find_first_of("?(");
-			//Si la position du caractère doit ce trouver dans la chaine de catactère
-			if (found < input.length() && found > 0)
-			{
-				//Copie l'entree afin qu'il ne soit pas modifé par le strtok
-				char *temp = new char[input.length() + 1];
-				strcpy(temp, (char *)input.c_str());
-				//Coupe la chaine au ?
-				char *identificateur = strtok(temp, "?(");
-
-				Fonctor fonctor = Fonctor(identificateur);
-				Type type = Type(identificateur);
-				if (input.at(found) == '?')
-				{
-					if (arbreF.contient(fonctor))
-					{
-						cout << *(arbreF.rechercher(fonctor));
-					}
-					else if (arbreT.contient(type))
-					{
-						cout << *(arbreT.rechercher(type));
-					}
-					else
-					{
-						cout << "PAS TROUVER" << endl;
-					}
-				}
-				else if (input.at(found) == '(')
-				{
-					//elm contient la string entre parenthèrse
-					string elm = input.substr(found, input.find(')'));
-					vector<string> elmFonctor;
-
-					for (char *p = strtok((char *)elm.c_str(), "( ,)"); p != NULL; p = strtok(NULL, "( ,)"))
-						elmFonctor.push_back(p);
-
-					//Itérateur positionner au ?
-					vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
-					int index;
-					bool sousClause1, sousClause2;
-					if (it != elmFonctor.end())
-					{
-						index = distance(elmFonctor.begin(), it);
-						if (arbreF.contient(fonctor))
-						{
-							fonctor = *(arbreF.rechercher(fonctor));
-							cout << "{";
-							string sep = "";
-							for (int i = 0; i < fonctor.matrice.size(); i++)
-							{
-								if (elmFonctor.size() == 1)
-								{
-									sousClause1 = true;
-									sousClause2 = true;
-								}
-								if (it == elmFonctor.begin())
-								{
-									sousClause1 = equal(fonctor.matrice[i].begin() + 1, fonctor.matrice[i].end(), it + 1);
-									sousClause2 = true;
-								}
-								else if (it == elmFonctor.end() - 1)
-								{
-									sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
-									sousClause2 = true;
-								}
-								else
-								{
-									sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
-									sousClause2 = equal(fonctor.matrice[i].begin() + index + 1, fonctor.matrice[i].end(), it + 1);
-								}
-
-								if (sousClause1 && sousClause2)
-								{
-									cout << sep << *(fonctor.matrice[i].begin() + index);
-									sep = ", ";
-								}
-							}
-							cout << "}" << endl;
-						}
-					}
-					else
-					{
-						cout << "Element Not Found" << endl;
-					}
-				}
-				delete[] temp;
-			}
-		}
 	}
 	else
 	{
@@ -231,6 +197,97 @@ vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 
 void lectureRequetes()
 {
+		string input;
+		while (getline(cin, input) && !cin.eof())
+		{
+			size_t found = input.find_first_of("?(");
+			//Si la position du caractère doit ce trouver dans la chaine de catactère
+			if (found < input.length() && found > 0)
+			{
+				//Copie l'entree afin qu'il ne soit pas modifé par le strtok
+				char *temp = new char[input.length() + 1];
+				strcpy(temp, (char *)input.c_str());
+				//Coupe la chaine au ?
+				char *identificateur = strtok(temp, "?(");
+
+				Fonctor fonctor = Fonctor(identificateur);
+				Type type = Type(identificateur);
+				if (input.at(found) == '?')
+				{
+					if (arbreF.contient(fonctor))
+					{
+						cout << *(arbreF.rechercher(fonctor));
+					}
+					else if (arbreT.contient(type))
+					{
+						cout << *(arbreT.rechercher(type));
+					}
+					else
+					{
+						cout << "PAS TROUVER" << endl;
+					}
+				}
+				else if (input.at(found) == '(')
+				{
+					//elm contient la string entre parenthèrse
+					string elm = input.substr(found, input.find(')'));
+					vector<string> elmFonctor;
+
+					for (char *p = strtok((char *)elm.c_str(), "( ,)"); p != NULL; p = strtok(NULL, "( ,)"))
+						elmFonctor.push_back(p);
+
+					//Itérateur positionner au ?
+					vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
+					int index;
+					bool sousClause1, sousClause2;
+					if (it != elmFonctor.end())
+					{
+						index = distance(elmFonctor.begin(), it);
+						if (arbreF.contient(fonctor))
+						{
+							fonctor = *(arbreF.rechercher(fonctor));
+							cout << "{";
+							string sep = "";
+							for (int i = 0; i < fonctor.matrice.size(); i++)
+							{
+								if (elmFonctor.size() == 1)
+								{
+									sousClause1 = true;
+									sousClause2 = true;
+								}
+								if (it == elmFonctor.begin())
+								{
+									sousClause1 = equal(fonctor.matrice[i].begin() + 1, fonctor.matrice[i].end(), it + 1);
+									sousClause2 = true;
+								}
+								else if (it == elmFonctor.end() - 1)
+								{
+									sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
+									sousClause2 = true;
+								}
+								else
+								{
+									sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
+									sousClause2 = equal(fonctor.matrice[i].begin() + index + 1, fonctor.matrice[i].end(), it + 1);
+								}
+
+								if (sousClause1 && sousClause2)
+								{
+									cout << sep << *(fonctor.matrice[i].begin() + index);
+									sep = ", ";
+								}
+							}
+							cout << "}" << endl;
+						}
+					}
+					else
+					{
+						cout << "Element Not Found" << endl;
+					}
+				}
+				delete[] temp;
+			}
+		}
 }
 
 bool estEnLettres(const char *id)
