@@ -56,6 +56,8 @@ vector<string> lectureClausesFonc(string ligne, vector<Type> type);
     @return 
 */
 void lectureRequetes();
+void traiterRequeteClauses(string input);
+void afficherCollectionRequete(string input);
 
 /*
    Vérifie que la chaine de caractère ne contient que des lettres. 
@@ -193,7 +195,32 @@ vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 	return clause;
 }
 
-void traiterRequeteClauses()
+void lectureRequetes()
+{
+	string input;
+	while (getline(cin, input) && !cin.eof())
+	{
+		size_t found = input.find_first_of("?(");
+		//Si la position du caractère doit ce trouver dans la chaine de catactère
+		if (found < input.length() && found > 0)
+		{
+
+			if (input.find_first_of("(") != string::npos)
+			{
+				traiterRequeteClauses(input);
+			}
+			else if (input.find_first_of("?") != string::npos)
+			{
+				afficherCollectionRequete(input);
+			}
+		}
+		else
+		{
+			erreur("Le format de la requête est invalide. ");
+		}
+	}
+}
+void traiterRequeteClauses(string input)
 {
 	char *identificateur = strtok((char *)input.c_str(), "(");
 	Fonctor fonctor = Fonctor(identificateur);
@@ -202,10 +229,7 @@ void traiterRequeteClauses()
 
 	for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
 		elmFonctor.push_back(p);
-}
 
-void validerRequeteClauses()
-{
 	//Itérateur positionner au ?
 	vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
 	if (it != elmFonctor.end())
@@ -240,7 +264,7 @@ void validerRequeteClauses()
 		erreur("Le point d'interrogation est absent : Format de la requête invalide.");
 }
 
-void afficherCollectionRequete()
+void afficherCollectionRequete(string input)
 {
 	char *identificateur = strtok((char *)input.c_str(), "?(");
 	Fonctor fonctor = Fonctor(identificateur);
@@ -251,30 +275,6 @@ void afficherCollectionRequete()
 		cout << *(arbreT.rechercher(type));
 	else
 		erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
-}
-
-void lectureRequetes()
-{
-	string input;
-	while (getline(cin, input) && !cin.eof())
-	{
-		size_t found = input.find_first_of("?(");
-		//Si la position du caractère doit ce trouver dans la chaine de catactère
-		if (found < input.length() && found > 0)
-		{
-
-			if (input.find_first_of("(") != string::npos)
-			{
-			}
-			else if (input.find_first_of("?") != string::npos)
-			{
-			}
-		}
-		else
-		{
-			erreur("Le format de la requête est invalide. ");
-		}
-	}
 }
 
 bool estEnLettres(const char *id)
