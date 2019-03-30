@@ -32,15 +32,14 @@ Type::Type()
 
 // Constructeur
 Type::Type(string id)
-{
-    identificateur = id; 
-}
+	: identificateur(id), idCollection(0){}
 
 // Destructeur
 Type::~Type()
 {
 	identificateur = "";
-    idCollection.clear(); //.shrink_to_fit ? et id = NULL?
+    	idCollection.clear(); 
+	idCollection.shrink_to_fit(); 
 }
 
 Type::operator bool() const
@@ -61,15 +60,13 @@ bool Type::operator!() const
 */
 bool Type::possede(const string argument) const
 {
-	if(find(idCollection.begin(), idCollection.end(), argument)!=idCollection.end())
-		return true;
-	return false;
+	return find(idCollection.begin(), idCollection.end(), argument)!=idCollection.end();
 }
 
 
 bool operator<(Type const* gauche, Type const droit) 
 {
-    return gauche->plusPetit(droit); 
+   	return gauche->plusPetit(droit); 
 }
 
 /*
@@ -85,7 +82,7 @@ bool Type::plusPetit(Type const& droit) const
 
 bool operator>(Type const* gauche, Type const droit)
 {
-    return gauche->plusGrand(droit); 
+	return gauche->plusGrand(droit); 
 }
 
 /*
@@ -96,7 +93,7 @@ bool operator>(Type const* gauche, Type const droit)
 */
 bool Type::plusGrand(Type const& droit) const
 {
-    return identificateur > droit.identificateur;
+	return identificateur > droit.identificateur;
 }
 
 /*
