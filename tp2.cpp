@@ -163,11 +163,11 @@ int main(int argc, const char **argv)
 			if (found < input.length() && found > 0)
 			{
 				//Copie l'entree afin qu'il ne soit pas modifé par le strtok
-				char *temp = new char[input.length()];
+				char *temp = new char[input.length()+1];
 				strcpy(temp, (char *)input.c_str());
 				//Coupe la chaine au ?
 				char *identificateur = strtok(temp, "?(");
-				delete [] temp;
+				
 				Fonctor fonctor = Fonctor(identificateur);
 				Type type = Type(identificateur);
 				if (input.at(found) == '?')
@@ -238,12 +238,14 @@ int main(int argc, const char **argv)
 							}
 							cout << "}" << endl;
 						}
+						
 					}
 					else
 					{
 						cout << "Element Not Found" << endl;
 					}
 				}
+				delete[] temp;
 			}
 		}
 	}
