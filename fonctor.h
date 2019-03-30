@@ -1,3 +1,16 @@
+/* UQAM / Département d'informatique
+   INF3105 - Structures de données et algorithmes
+   
+   Classe représentant un Fonctor. 
+
+   AUTEUR(S):
+    1) Noura Djaffri DJAN28569508
+    2) Laurianne Guindon GUIL22579900
+*/
+
+#if !defined(__FONCTOR__H__)
+#define __FONCTOR__H__
+
 #include <vector>
 using namespace std;
 
@@ -109,3 +122,5 @@ void Fonctor::afficher(ostream &os) const
     }
     os << "";
 }
+
+#endif

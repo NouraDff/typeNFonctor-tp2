@@ -1,3 +1,16 @@
+/* UQAM / Département d'informatique
+   INF3105 - Structures de données et algorithmes
+   
+   Classe représentant un Type. 
+
+   AUTEUR(S):
+    1) Noura Djaffri DJAN28569508
+    2) Laurianne Guindon GUIL22579900
+*/
+
+#if !defined(__TYPE__H__)
+#define __TYPE__H__
+
 #include <vector>
 using namespace std;
 
@@ -120,3 +133,5 @@ void Type::afficher(ostream &os) const
 		os << ", " << idCollection.at(i);
 	os << "}" << endl;
 }
+
+#endif

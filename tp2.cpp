@@ -1,3 +1,22 @@
+/* UQAM / Département d'informatique
+   INF3105 - Structures de données et algorithmes
+   
+   Ce programme permet de réaliser des requêtes afin 
+   consulter une base de connaissances. 
+
+   Deux requêtes sont possible: 
+   <nom>? Le nom peut être fonctor ou un type
+		  Affiche le contenue associé 
+	<fonctor>(<type>, ?, ..., <type>)
+		  Affiche toutes les possibiltés qui peuvent
+		  remplacer le ? dans les clauses d'un fonctor
+	
+
+   AUTEUR(S):
+    1) Noura Djaffri DJAN28569508
+    2) Laurianne Guindon GUIL22579900
+*/
+
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -15,18 +34,18 @@ static ArbreAVL<Type> arbreT = ArbreAVL<Type>();
 static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
 
 /*
+   Fait la lecture d'un fichier et le traitement des données pour les ajouter 
+   à la base de connaissance. 
    
-   
-    @params 
-    @return 
+    @params fichier: le flux d'entrée d'un fichier
 */
-void lectureBaseConnaissances(ifstream &);
+void lectureBaseConnaissances(ifstream &fichier);
 
 /*
    Lit l'entrée vérifie que les types entrés sont uniques. 
    
     @params ligne : entrée à lire
-    @return vecteur contenant
+    @return vecteur contenant la liste des types d'un Type
 */
 vector<string> lectureArgumentsType(string ligne);
 
@@ -45,19 +64,36 @@ vector<Type> lectureTypesFonc(string ligne);
    
     @params ligne: ligne contenant l'entrée à lire
 			type: vecteur contenant les types
-    @return 
+    @return un vecteur qui contient les clauses d'un foncteur
 */
 vector<string> lectureClausesFonc(string ligne, vector<Type> type);
 
 /*
-   
-   
-    @params 
-    @return 
+    Fait la lecture au clavier des requêtes <nom>? et <fonctor>(<type>, ?, ..., <type>). 
 */
 void lectureRequetes();
-void traiterRequeteClauses(string input);
-void afficherCollectionRequete(string input);
+
+/*
+	traite l'entrée au clavier et met les éléments de la clause dans un vecteur
+   
+    @params entree: l'entrée au clavier
+*/
+void traiterRequeteClauses(string entree);
+
+/*
+    Affiche le résultat de la requête <fonctor>(<type>, ?, ..., <type>)
+   
+    @params matrice: matrice du fonctor identifié
+			elmFonctor: vector qui contient les éléments entrées au clavier
+*/
+void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFonctor);
+
+/*
+    Affiche le résultat d'une requête <nom>? soit la collection de l'identificateur
+   
+    @params entree: l'entrée au clavier.  
+*/
+void afficherCollectionRequete(string entree);
 
 /*
    Vérifie que la chaine de caractère ne contient que des lettres. 
@@ -90,25 +126,25 @@ int main(int argc, const char **argv)
 	{
 		lectureBaseConnaissances(fichier);
 		lectureRequetes();
-
-		/*--------------------------------------------------------
-	 	*
-	 	* Lecture Clavier
-	 	*
-	 	* -------------------------------------------------------*/
 	}
 	else
-	{
-		cerr << "Impossible d'ouvrir le fichier.";
-	}
+		erreur("Impossible d'ouvrir le fichier.");
 
 	return 0;
 }
+
+//
+//		LECTURE FICHIER
+//
 
 void lectureBaseConnaissances(ifstream &fichier)
 {
 	string entree, nom, ligne;
 
+	if (fichier.peek() == ifstream::traits_type::eof())
+	{
+		erreur("Le fichier est vide, aucun traitement ne sera fait.");
+	}
 	while (fichier >> entree >> nom)
 	{
 		Type type = Type(nom);
@@ -121,7 +157,7 @@ void lectureBaseConnaissances(ifstream &fichier)
 				type.idCollection = lectureArgumentsType(ligne);
 				arbreT.inserer(type);
 			}
-			else if (!entree.compare("foncteur"))
+			else if (!entree.compare("fonctor"))
 			{
 				getline(fichier, ligne);
 				vector<Type> vecT = lectureTypesFonc(ligne);
@@ -152,8 +188,8 @@ vector<string> lectureArgumentsType(string ligne)
 	for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
 	{
 		arguments.push_back(p);
-		if (!estEnLettres(p))
-			erreur("Les arguments ne contiennent pas uniquement que des lettres.");
+		if (!estEnLettres(p) && strcmp(p, "type") && strcmp(p, "fonctor"))
+			erreur("Les noms des arguments ne sont pas tous validés.");
 		if (find(arguments.begin(), arguments.end(), p) == arguments.end())
 			erreur("Les arguments ne sont pas tous uniques.");
 	}
@@ -195,78 +231,72 @@ vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 	return clause;
 }
 
+//
+//		REQUETES CLAVIER
+//
+
 void lectureRequetes()
 {
-	string input;
-	while (getline(cin, input) && !cin.eof())
+	string entree;
+	while (getline(cin, entree) && !cin.eof())
 	{
-		size_t found = input.find_first_of("?(");
+		size_t found = entree.find_first_of("?(");
 		//Si la position du caractère doit ce trouver dans la chaine de catactère
-		if (found < input.length() && found > 0)
-		{
-
-			if (input.find_first_of("(") != string::npos)
-			{
-				traiterRequeteClauses(input);
-			}
-			else if (input.find_first_of("?") != string::npos)
-			{
-				afficherCollectionRequete(input);
-			}
-		}
-		else
-		{
-			erreur("Le format de la requête est invalide. ");
-		}
+		if (found < entree.length() && found > 0)
+			if (entree.find_first_of("(") != string::npos)
+				traiterRequeteClauses(entree);
+			else if (entree.find_first_of("?") != string::npos)
+				afficherCollectionRequete(entree);
+			else
+				erreur("Le format de la requête est invalide. ");
 	}
 }
-void traiterRequeteClauses(string input)
+
+void traiterRequeteClauses(string entree)
 {
-	char *identificateur = strtok((char *)input.c_str(), "(");
+	char *identificateur = strtok((char *)entree.c_str(), "(");
 	Fonctor fonctor = Fonctor(identificateur);
-	//elm contient la string entre parenthèrse
-	vector<string> elmFonctor;
-
-	for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
-		elmFonctor.push_back(p);
-
 	//Itérateur positionner au ?
-	vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
-	if (it != elmFonctor.end())
+	if (arbreF.contient(fonctor))
 	{
-		if (arbreF.contient(fonctor))
-		{
-			fonctor = *(arbreF.rechercher(fonctor));
+		fonctor = *(arbreF.rechercher(fonctor));
+		vector<string> elmFonctor;
 
-			cout << "{";
-			string sep = "";
-			for (unsigned i = 0; i < fonctor.matrice.size(); ++i)
-			{
-				vector<string>::iterator index = fonctor.matrice[i].begin() + distance(elmFonctor.begin(), it);
-				bool sousClause1 = true, sousClause2 = true;
-				if (it != elmFonctor.end() - 1)
-					sousClause2 = equal(index + 1, fonctor.matrice[i].end(), it + 1);
-				if (it != elmFonctor.begin())
-					sousClause1 = equal(fonctor.matrice[i].begin(), index, elmFonctor.begin());
+		//elm contient la string entre parenthèrse
+		for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
+			elmFonctor.push_back(p);
 
-				if (sousClause1 && sousClause2)
-				{
-					cout << sep << *(index);
-					sep = ", ";
-				}
-			}
-			cout << "}" << endl;
-		}
-		else
-			erreur("Le fonctor n'existe pas.");
+		validerRequeteClauses(fonctor.matrice, elmFonctor);
 	}
 	else
-		erreur("Le point d'interrogation est absent : Format de la requête invalide.");
+		erreur("Le fonctor n'existe pas.");
 }
 
-void afficherCollectionRequete(string input)
+void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFonctor)
 {
-	char *identificateur = strtok((char *)input.c_str(), "?(");
+	vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
+	cout << "{";
+	string sep = "";
+	for (unsigned i = 0; i < matrice.size(); ++i)
+	{
+		vector<string>::iterator index = matrice[i].begin() + distance(elmFonctor.begin(), it);
+		bool sousClause1 = true, sousClause2 = true;
+		if (it != elmFonctor.end() - 1)
+			sousClause2 = equal(index + 1, matrice[i].end(), it + 1);
+		if (it != elmFonctor.begin())
+			sousClause1 = equal(matrice[i].begin(), index, elmFonctor.begin());
+		if (sousClause1 && sousClause2)
+		{
+			cout << sep << *(index);
+			sep = ", ";
+		}
+	}
+	cout << "}" << endl;
+}
+
+void afficherCollectionRequete(string entree)
+{
+	char *identificateur = strtok((char *)entree.c_str(), "?(");
 	Fonctor fonctor = Fonctor(identificateur);
 	Type type = Type(identificateur);
 	if (arbreF.contient(fonctor))
@@ -276,6 +306,10 @@ void afficherCollectionRequete(string input)
 	else
 		erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
 }
+
+//
+//		UTILITAIRES
+//
 
 bool estEnLettres(const char *id)
 {
@@ -295,5 +329,5 @@ void vider(vector<T> *vect)
 void erreur(const string err)
 {
 	cerr << err << endl;
-	exit(1); // s'assurer tt var delete (ex: les vecteurs) et que fichier est close??
+	exit(1);
 }
