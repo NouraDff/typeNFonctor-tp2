@@ -229,13 +229,13 @@ void lectureRequetes()
 						if (arbreF.contient(fonctor))
 						{
 							fonctor = *(arbreF.rechercher(fonctor));
-							vector<string>::iterator index = fonctor.matrice[distance(elmFonctor.begin(), it)];
+							vector<vector<string>>::iterator index = fonctor.matrice[distance(elmFonctor.begin(), it)];
 							cout << "{";
 							string sep = "";
 							for (unsigned i = 0; i < fonctor.matrice.size(); ++i)
 							{
 								bool sousClause1 = true, sousClause2 = true;
-								if (it != elmFonctor.back())
+								if (it != elmFonctor.end()-1)
 									sousClause2 = equal(index + 1, fonctor.matrice[i].end(), it + 1);
 								if (it != elmFonctor.begin())
 									sousClause1 = equal(fonctor.matrice[i].begin(), index, elmFonctor.begin());
