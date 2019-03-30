@@ -8,8 +8,8 @@ class Fonctor
     vector<vector<string>> matrice;
 
     // Opérateurs
-    friend bool operator>(Fonctor const* gauche, Fonctor const droit);
     friend bool operator<(Fonctor const* gauche, Fonctor const droit);
+    friend bool operator>(Fonctor const* gauche, Fonctor const droit);
     friend ostream &operator<<(ostream &os, const Fonctor &fonctor);
 
     Fonctor();
@@ -18,24 +18,24 @@ class Fonctor
 
   private:
     void afficher(ostream &os) const;
-    bool plusGrand(Fonctor const& droit) const;
     bool plusPetit(Fonctor const& droit) const;
+    bool plusGrand(Fonctor const& droit) const;
 };
 
 // Constructeur sans argument
 Fonctor::Fonctor()
-    : identificateur(""), matrice(0){}
+	: identificateur(""), matrice(0){}
 
 // Constructeur
 Fonctor::Fonctor(string id)
-{
-    identificateur = id;
-}
+	: identificateur(id), matrice(0){}
 
 // Destructeur
 Fonctor::~Fonctor()
 {
-    matrice.clear();
+	identificateur = "";
+	matrice.clear();
+	matrice.shrink_to_fit();
 }
 
 bool operator<(Fonctor const* gauche, Fonctor const droit)
@@ -51,11 +51,7 @@ bool operator<(Fonctor const* gauche, Fonctor const droit)
 */
 bool Fonctor::plusPetit(Fonctor const& droit) const
 {
-    if (identificateur < droit.identificateur)
-    {
-        return true;
-    }
-    return false;
+	return identificateur < droit.identificateur;
 }
 
 bool operator>(Fonctor const* gauche, Fonctor const droit)
@@ -71,11 +67,7 @@ bool operator>(Fonctor const* gauche, Fonctor const droit)
 */
 bool Fonctor::plusGrand(Fonctor const& droit) const
 {
-    if (identificateur > droit.identificateur)
-    {
-        return true;
-    }
-    return false;
+	return identificateur > droit.identificateur;
 }
 
 /*
