@@ -193,6 +193,66 @@ vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 	return clause;
 }
 
+void traiterRequeteClauses()
+{
+	char *identificateur = strtok((char *)input.c_str(), "(");
+	Fonctor fonctor = Fonctor(identificateur);
+	//elm contient la string entre parenthèrse
+	vector<string> elmFonctor;
+
+	for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
+		elmFonctor.push_back(p);
+}
+
+void validerRequeteClauses()
+{
+	//Itérateur positionner au ?
+	vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
+	if (it != elmFonctor.end())
+	{
+		if (arbreF.contient(fonctor))
+		{
+			fonctor = *(arbreF.rechercher(fonctor));
+
+			cout << "{";
+			string sep = "";
+			for (unsigned i = 0; i < fonctor.matrice.size(); ++i)
+			{
+				vector<string>::iterator index = fonctor.matrice[i].begin() + distance(elmFonctor.begin(), it);
+				bool sousClause1 = true, sousClause2 = true;
+				if (it != elmFonctor.end() - 1)
+					sousClause2 = equal(index + 1, fonctor.matrice[i].end(), it + 1);
+				if (it != elmFonctor.begin())
+					sousClause1 = equal(fonctor.matrice[i].begin(), index, elmFonctor.begin());
+
+				if (sousClause1 && sousClause2)
+				{
+					cout << sep << *(index);
+					sep = ", ";
+				}
+			}
+			cout << "}" << endl;
+		}
+		else
+			erreur("Le fonctor n'existe pas.");
+	}
+	else
+		erreur("Le point d'interrogation est absent : Format de la requête invalide.");
+}
+
+void afficherCollectionRequete()
+{
+	char *identificateur = strtok((char *)input.c_str(), "?(");
+	Fonctor fonctor = Fonctor(identificateur);
+	Type type = Type(identificateur);
+	if (arbreF.contient(fonctor))
+		cout << *(arbreF.rechercher(fonctor));
+	else if (arbreT.contient(type))
+		cout << *(arbreT.rechercher(type));
+	else
+		erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
+}
+
 void lectureRequetes()
 {
 	string input;
@@ -205,61 +265,14 @@ void lectureRequetes()
 
 			if (input.find_first_of("(") != string::npos)
 			{
-				char *identificateur = strtok((char *)input.c_str(), "(");
-				Fonctor fonctor = Fonctor(identificateur);
-				//elm contient la string entre parenthèrse
-				vector<string> elmFonctor;
-
-				for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
-					elmFonctor.push_back(p);
-
-				//Itérateur positionner au ?
-				vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
-				if (it != elmFonctor.end())
-				{
-					if (arbreF.contient(fonctor))
-					{
-						fonctor = *(arbreF.rechercher(fonctor));
-
-						cout << "{";
-						string sep = "";
-						for (unsigned i = 0; i < fonctor.matrice.size(); ++i)
-						{
-							vector<string>::iterator index = fonctor.matrice[i].begin() + distance(elmFonctor.begin(), it);
-							bool sousClause1 = true, sousClause2 = true;
-							if (it != elmFonctor.end() - 1)
-								sousClause2 = equal(index + 1, fonctor.matrice[i].end(), it + 1);
-							if (it != elmFonctor.begin())
-								sousClause1 = equal(fonctor.matrice[i].begin(), index, elmFonctor.begin());
-
-							if (sousClause1 && sousClause2)
-							{
-								cout << sep << *(index);
-								sep = ", ";
-							}
-						}
-						cout << "}" << endl;
-					}
-					else
-						erreur("Le fonctor n'existe pas.");
-				}
-				else
-					erreur("Le point d'interrogation est absent : Format de la requête invalide.");
 			}
 			else if (input.find_first_of("?") != string::npos)
 			{
-				char *identificateur = strtok((char *)input.c_str(), "?(");
-				Fonctor fonctor = Fonctor(identificateur);
-				Type type = Type(identificateur);
-				if (arbreF.contient(fonctor))
-					cout << *(arbreF.rechercher(fonctor));
-				else if (arbreT.contient(type))
-					cout << *(arbreT.rechercher(type));
-				else
-					erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
 			}
-		}else{
-			erreur("Le format de la requête est invalide. "); 
+		}
+		else
+		{
+			erreur("Le format de la requête est invalide. ");
 		}
 	}
 }
