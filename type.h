@@ -66,9 +66,9 @@ bool Type::operator!() const
 }
 
 /*
-   Recherche si la clause dans un fonctor possède le type. 
+   Recherche si la clause dans un foncteur possède le type. 
    
-    @params argument: argument correspond à un élément dans un clause dans un fonctor
+    @params argument: argument correspond à un élément dans un clause dans un foncteur
     @return vrai si l'argument correspond à un type, sinon vrai. 
 */
 bool Type::possede(const string argument) const
@@ -92,7 +92,7 @@ bool Type::plusPetit(Type const &droit) const
 	return identificateur < droit.identificateur;
 }
 
-bool operator>(Type const *gauche, Type const droit)
+bool operator>(Type const *gauche, Type const droit) 
 {
 	return gauche->plusGrand(droit);
 }

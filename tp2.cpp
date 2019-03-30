@@ -5,11 +5,11 @@
    consulter une base de connaissances. 
 
    Deux requêtes sont possible: 
-   <nom>? Le nom peut être fonctor ou un type
+   <nom>? Le nom peut être foncteur ou un type
 		  Affiche le contenue associé 
-	<fonctor>(<type>, ?, ..., <type>)
+	<foncteur>(<type>, ?, ..., <type>)
 		  Affiche toutes les possibiltés qui peuvent
-		  remplacer le ? dans les clauses d'un fonctor
+		  remplacer le ? dans les clauses d'un foncteur
 	
 
    AUTEUR(S):
@@ -26,12 +26,12 @@
 #include <string.h>
 #include "arbreavl.h"
 #include "type.h"
-#include "fonctor.h"
+#include "foncteur.h"
 
 using namespace std;
 
 static ArbreAVL<Type> arbreT = ArbreAVL<Type>();
-static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
+static ArbreAVL<Foncteur> arbreF = ArbreAVL<Foncteur>();
 
 /*
    Fait la lecture d'un fichier et le traitement des données pour les ajouter 
@@ -50,7 +50,7 @@ void lectureBaseConnaissances(ifstream &fichier);
 vector<string> lectureArgumentsType(string ligne);
 
 /*
-    Met dans un vecteur la liste des types que contiennent les clauses du fonctor
+    Met dans un vecteur la liste des types que contiennent les clauses du foncteur
 	et vérifie que le nombre de type correspond au nombre d'élément dans une clause. 
    
     @params ligne: ligne contenant l'entrée à lire
@@ -69,7 +69,7 @@ vector<Type> lectureTypesFonc(string ligne);
 vector<string> lectureClausesFonc(string ligne, vector<Type> type);
 
 /*
-    Fait la lecture au clavier des requêtes <nom>? et <fonctor>(<type>, ?, ..., <type>). 
+    Fait la lecture au clavier des requêtes <nom>? et <foncteur>(<type>, ?, ..., <type>). 
 */
 void lectureRequetes();
 
@@ -81,12 +81,12 @@ void lectureRequetes();
 void traiterRequeteClauses(string entree);
 
 /*
-    Affiche le résultat de la requête <fonctor>(<type>, ?, ..., <type>)
+    Affiche le résultat de la requête <foncteur>(<type>, ?, ..., <type>)
    
-    @params matrice: matrice du fonctor identifié
-			elmFonctor: vector qui contient les éléments entrées au clavier
+    @params matrice: matrice du foncteur identifié
+			elmFoncteur: vector qui contient les éléments entrées au clavier
 */
-void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFonctor);
+void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFoncteur);
 
 /*
     Affiche le résultat d'une requête <nom>? soit la collection de l'identificateur
@@ -148,8 +148,8 @@ void lectureBaseConnaissances(ifstream &fichier)
 	while (fichier >> entree >> nom)
 	{
 		Type type = Type(nom);
-		Fonctor fonctor = Fonctor(nom);
-		if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(type) && !arbreF.contient(fonctor))
+		Foncteur foncteur = Foncteur(nom);
+		if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("foncteur") && !arbreT.contient(type) && !arbreF.contient(foncteur))
 		{
 			if (!entree.compare("type"))
 			{
@@ -157,7 +157,7 @@ void lectureBaseConnaissances(ifstream &fichier)
 				type.idCollection = lectureArgumentsType(ligne);
 				arbreT.inserer(type);
 			}
-			else if (!entree.compare("fonctor"))
+			else if (!entree.compare("foncteur"))
 			{
 				getline(fichier, ligne);
 				vector<Type> vecT = lectureTypesFonc(ligne);
@@ -168,15 +168,15 @@ void lectureBaseConnaissances(ifstream &fichier)
 					vecF.push_back(lectureClausesFonc(ligne, vecT));
 				}
 				vider(&vecT);
-				fonctor.matrice = vecF;
-				arbreF.inserer(fonctor);
+				foncteur.matrice = vecF;
+				arbreF.inserer(foncteur);
 				vider(&vecF);
 			}
 			else
 				erreur("Le contenu du fichier est invalide.");
 		}
 		else
-			erreur("Les noms des types et/ou fonctors ne sont pas tous valides.");
+			erreur("Les noms des types et/ou foncteurs ne sont pas tous valides.");
 	}
 
 	fichier.close();
@@ -188,7 +188,7 @@ vector<string> lectureArgumentsType(string ligne)
 	for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
 	{
 		arguments.push_back(p);
-		if (!estEnLettres(p) && strcmp(p, "type") && strcmp(p, "fonctor"))
+		if (!estEnLettres(p) && strcmp(p, "type") && strcmp(p, "foncteur"))
 			erreur("Les noms des arguments ne sont pas tous validés.");
 		if (find(arguments.begin(), arguments.end(), p) == arguments.end())
 			erreur("Les arguments ne sont pas tous uniques.");
@@ -255,36 +255,36 @@ void lectureRequetes()
 void traiterRequeteClauses(string entree)
 {
 	char *identificateur = strtok((char *)entree.c_str(), "(");
-	Fonctor fonctor = Fonctor(identificateur);
+	Foncteur foncteur = Foncteur(identificateur);
 	//Itérateur positionner au ?
-	if (arbreF.contient(fonctor))
+	if (arbreF.contient(foncteur))
 	{
-		fonctor = *(arbreF.rechercher(fonctor));
-		vector<string> elmFonctor;
+		foncteur = *(arbreF.rechercher(foncteur));
+		vector<string> elmFoncteur;
 
 		//elm contient la string entre parenthèrse
 		for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
-			elmFonctor.push_back(p);
+			elmFoncteur.push_back(p);
 
-		validerRequeteClauses(fonctor.matrice, elmFonctor);
+		validerRequeteClauses(foncteur.matrice, elmFoncteur);
 	}
 	else
-		erreur("Le fonctor n'existe pas.");
+		erreur("Le foncteur n'existe pas.");
 }
 
-void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFonctor)
+void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFoncteur)
 {
-	vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
+	vector<string>::iterator it = find(elmFoncteur.begin(), elmFoncteur.end(), "?");
 	cout << "{";
 	string sep = "";
 	for (unsigned i = 0; i < matrice.size(); ++i)
 	{
-		vector<string>::iterator index = matrice[i].begin() + distance(elmFonctor.begin(), it);
+		vector<string>::iterator index = matrice[i].begin() + distance(elmFoncteur.begin(), it);
 		bool sousClause1 = true, sousClause2 = true;
-		if (it != elmFonctor.end() - 1)
+		if (it != elmFoncteur.end() - 1)
 			sousClause2 = equal(index + 1, matrice[i].end(), it + 1);
-		if (it != elmFonctor.begin())
-			sousClause1 = equal(matrice[i].begin(), index, elmFonctor.begin());
+		if (it != elmFoncteur.begin())
+			sousClause1 = equal(matrice[i].begin(), index, elmFoncteur.begin());
 		if (sousClause1 && sousClause2)
 		{
 			cout << sep << *(index);
@@ -297,14 +297,14 @@ void validerRequeteClauses(vector<vector<string>> matrice, vector<string> elmFon
 void afficherCollectionRequete(string entree)
 {
 	char *identificateur = strtok((char *)entree.c_str(), "?(");
-	Fonctor fonctor = Fonctor(identificateur);
+	Foncteur foncteur = Foncteur(identificateur);
 	Type type = Type(identificateur);
-	if (arbreF.contient(fonctor))
-		cout << *(arbreF.rechercher(fonctor));
+	if (arbreF.contient(foncteur))
+		cout << *(arbreF.rechercher(foncteur));
 	else if (arbreT.contient(type))
 		cout << *(arbreT.rechercher(type));
 	else
-		erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
+		erreur("Le type ou le foncteur n'existe pas, dans la base de connaissances.");
 }
 
 //
