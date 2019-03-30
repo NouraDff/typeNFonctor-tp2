@@ -179,7 +179,7 @@ vector<Type> lectureTypesFonc(string ligne)
 vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 {
 	vector<string> clause;
-	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
+	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, "() ,\r"))
 	{
 		clause.push_back(p);
 		if (clause.size() > type.size())
@@ -202,88 +202,64 @@ void lectureRequetes()
 		//Si la position du caractère doit ce trouver dans la chaine de catactère
 		if (found < input.length() && found > 0)
 		{
-			//Copie l'entree afin qu'il ne soit pas modifé par le strtok
-			char *temp = new char[input.length() + 1];
-			strcpy(temp, (char *)input.c_str());
-			//Coupe la chaine au ?
-			char *identificateur = strtok(temp, "?(");
 
-			Fonctor fonctor = Fonctor(identificateur);
-			Type type = Type(identificateur);
-			if (input.at(found) == '?')
+			if (input.find_first_of("(") != string::npos)
 			{
-				if (arbreF.contient(fonctor))
-				{
-					cout << *(arbreF.rechercher(fonctor));
-				}
-				else if (arbreT.contient(type))
-				{
-					cout << *(arbreT.rechercher(type));
-				}
-				else
-				{
-					cout << "PAS TROUVER" << endl;
-				}
-			}
-			else if (input.at(found) == '(')
-			{
+				char *identificateur = strtok((char *)input.c_str(), "(");
+				Fonctor fonctor = Fonctor(identificateur);
 				//elm contient la string entre parenthèrse
-				string elm = input.substr(found, input.find(')'));
 				vector<string> elmFonctor;
 
-				for (char *p = strtok((char *)elm.c_str(), "( ,)"); p != NULL; p = strtok(NULL, "( ,)"))
+				for (char *p = strtok(NULL, " ,)"); p != NULL; p = strtok(NULL, " ,)"))
 					elmFonctor.push_back(p);
 
 				//Itérateur positionner au ?
 				vector<string>::iterator it = find(elmFonctor.begin(), elmFonctor.end(), "?");
-				int index;
-				bool sousClause1, sousClause2;
 				if (it != elmFonctor.end())
 				{
-					index = distance(elmFonctor.begin(), it);
 					if (arbreF.contient(fonctor))
 					{
 						fonctor = *(arbreF.rechercher(fonctor));
+
 						cout << "{";
 						string sep = "";
-						for (int i = 0; i < fonctor.matrice.size(); i++)
+						for (unsigned i = 0; i < fonctor.matrice.size(); ++i)
 						{
-							if (elmFonctor.size() == 1)
-							{
-								sousClause1 = true;
-								sousClause2 = true;
-							}
-							if (it == elmFonctor.begin())
-							{
-								sousClause1 = equal(fonctor.matrice[i].begin() + 1, fonctor.matrice[i].end(), it + 1);
-								sousClause2 = true;
-							}
-							else if (it == elmFonctor.end() - 1)
-							{
-								sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
-								sousClause2 = true;
-							}
-							else
-							{
-								sousClause1 = equal(fonctor.matrice[i].begin(), fonctor.matrice[i].begin() + index, elmFonctor.begin());
-								sousClause2 = equal(fonctor.matrice[i].begin() + index + 1, fonctor.matrice[i].end(), it + 1);
-							}
+							vector<string>::iterator index = fonctor.matrice[i].begin() + distance(elmFonctor.begin(), it);
+							bool sousClause1 = true, sousClause2 = true;
+							if (it != elmFonctor.end() - 1)
+								sousClause2 = equal(index + 1, fonctor.matrice[i].end(), it + 1);
+							if (it != elmFonctor.begin())
+								sousClause1 = equal(fonctor.matrice[i].begin(), index, elmFonctor.begin());
 
 							if (sousClause1 && sousClause2)
 							{
-								cout << sep << *(fonctor.matrice[i].begin() + index);
+								cout << sep << *(index);
 								sep = ", ";
 							}
 						}
 						cout << "}" << endl;
 					}
+					else
+						erreur("Le fonctor n'existe pas.");
 				}
 				else
-				{
-					cout << "Element Not Found" << endl;
-				}
+					erreur("Le point d'interrogation est absent : Format de la requête invalide.");
 			}
-			delete[] temp;
+			else if (input.find_first_of("?") != string::npos)
+			{
+				char *identificateur = strtok((char *)input.c_str(), "?(");
+				Fonctor fonctor = Fonctor(identificateur);
+				Type type = Type(identificateur);
+				if (arbreF.contient(fonctor))
+					cout << *(arbreF.rechercher(fonctor));
+				else if (arbreT.contient(type))
+					cout << *(arbreT.rechercher(type));
+				else
+					erreur("Le type ou le fonctor n'existe pas, dans la base de connaissances.");
+			}
+		}else{
+			erreur("Le format de la requête est invalide. "); 
 		}
 	}
 }
