@@ -14,10 +14,10 @@ using namespace std;
 static ArbreAVL<Type> arbreT = ArbreAVL<Type>();
 static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
 
-void lecture(ifstream &);
-void lectureArgumentsType(string, vector<string> &);
-void lectureTypesFonc(string, vector<Type> &);
-void lectureClausesFonc(string, vector<vector<string>> &, vector<Type>);
+void lectureBaseConnaissances(ifstream &);
+vector<string> lectureArgumentsType(string);
+vector<Type> lectureTypesFonc(string);
+vector<string> lectureClausesFonc(string, vector<Type>);
 void lectureRequetes();
 bool estEnLettres(const char *);
 template <class T>
@@ -30,7 +30,9 @@ int main(int argc, const char **argv)
 
 	if (fichier)
 	{
-		lecture(fichier);
+		lectureBaseConnaissances(fichier);
+		lectureRequetes();
+
 		/*--------------------------------------------------------
 	 	*
 	 	* Lecture Clavier
@@ -137,56 +139,50 @@ int main(int argc, const char **argv)
 	return 0;
 }
 
-void lecture(ifstream &fichier)
+void lectureBaseConnaissances(ifstream &fichier)
 {
-	Type type;
-	Fonctor tempF;
-	vector<string> clause, arguments;
-	vector<Type> vecT;
-	vector<vector<string>> fonc;
 	string entree, nom, ligne;
 
 	while (fichier >> entree >> nom)
 	{
-		type = Type(nom);
-		tempF = Fonctor(nom);
-		if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(type) && !arbreF.contient(tempF))
+		Type type = Type(nom);
+		Fonctor fonctor = Fonctor(nom);
+		if (estEnLettres(nom.c_str()) && nom.compare("type") && nom.compare("fonctor") && !arbreT.contient(type) && !arbreF.contient(fonctor))
 		{
 			if (!entree.compare("type"))
 			{
 				getline(fichier, ligne);
-				lectureArgumentsType(ligne, arguments);
-				type.idCollection = arguments; // si on enleve vect arguments et que idCollection = lectureType, est-ce qu'on doit supprimer??
+				type.idCollection = lectureArgumentsType(ligne);
 				arbreT.inserer(type);
-				vider(&arguments);
 			}
 			else if (!entree.compare("foncteur"))
 			{
 				getline(fichier, ligne);
-				lectureTypesFonc(ligne, vecT);
+				vector<Type> vecT = lectureTypesFonc(ligne);
+				vector<vector<string>> vecF;
 				while (fichier.peek() == '(')
 				{
 					getline(fichier, ligne);
-					lectureClausesFonc(ligne, fonc, vecT);
+					vecF.push_back(lectureClausesFonc(ligne, vecT));
 				}
 				vider(&vecT);
-				tempF.matrice = fonc;
-				arbreF.inserer(tempF);
-				vider(&fonc);
+				fonctor.matrice = vecF;
+				arbreF.inserer(fonctor);
+				vider(&vecF);
 			}
 			else
-			{
 				erreur("Le contenu du fichier est invalide.");
-			}
 		}
 		else
 			erreur("Les noms des types et/ou fonctors ne sont pas tous valides.");
 	}
+
 	fichier.close();
 }
 
-void lectureArgumentsType(string ligne, vector<string> &arguments)
+vector<string> lectureArgumentsType(string ligne)
 {
+	vector<string> arguments;
 	for (char *p = strtok((char *)ligne.c_str(), "= {,\r"); p != NULL; p = strtok(NULL, " ,}\r"))
 	{
 		arguments.push_back(p);
@@ -195,11 +191,13 @@ void lectureArgumentsType(string ligne, vector<string> &arguments)
 		if (find(arguments.begin(), arguments.end(), p) == arguments.end())
 			erreur("Les arguments ne sont pas tous uniques.");
 	}
+	return arguments;
 }
 
-void lectureTypesFonc(string ligne, vector<Type> &vecT)
+vector<Type> lectureTypesFonc(string ligne)
 {
 	Type type;
+	vector<Type> vecT;
 	for (char *p = strtok((char *)ligne.c_str(), ": ,"); p != NULL; p = strtok(NULL, " ,"))
 	{
 		type = Type(p);
@@ -211,9 +209,10 @@ void lectureTypesFonc(string ligne, vector<Type> &vecT)
 			vecT.push_back(type);
 		}
 	}
+	return vecT;
 }
 
-void lectureClausesFonc(string ligne, vector<vector<string>> &fonc, vector<Type> type)
+vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 {
 	vector<string> clause;
 	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
@@ -227,8 +226,7 @@ void lectureClausesFonc(string ligne, vector<vector<string>> &fonc, vector<Type>
 	if (clause.size() != type.size())
 		erreur("Le format des clauses est invalide.");
 
-	fonc.push_back(clause);
-	vider(&clause);
+	return clause;
 }
 
 void lectureRequetes()
