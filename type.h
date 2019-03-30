@@ -80,10 +80,7 @@ bool operator<(Type const* gauche, Type const droit)
 */
 bool Type::plusPetit(Type const& droit) const
 {
-	if(identificateur < droit.identificateur){
-        	return true;
-    	}
-    	return false;
+	return identificateur < droit.identificateur;
 }
 
 bool operator>(Type const* gauche, Type const droit)
@@ -99,10 +96,7 @@ bool operator>(Type const* gauche, Type const droit)
 */
 bool Type::plusGrand(Type const& droit) const
 {
-    if(identificateur > droit.identificateur){
-        return true;
-    }
-    return false;
+    return identificateur > droit.identificateur;
 }
 
 /*
@@ -115,7 +109,7 @@ bool Type::plusGrand(Type const& droit) const
 ostream &operator<<(ostream &os, const Type& type)
 {
         type.afficher(os);
-    return os;
+	return os;
 }
 
 /*
@@ -126,8 +120,7 @@ ostream &operator<<(ostream &os, const Type& type)
 void Type::afficher(ostream &os) const
 {
     os << "{" <<  idCollection.at(0);
-    for (int i = 1; i < idCollection.size(); i++) {
+    for (int i = 1; i < idCollection.size(); i++)
 		os << ", " << idCollection.at(i);
-	}
     os << "}" << endl; 
 }

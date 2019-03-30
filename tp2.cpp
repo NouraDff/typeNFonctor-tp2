@@ -215,7 +215,7 @@ vector<Type> lectureTypesFonc(string ligne)
 vector<string> lectureClausesFonc(string ligne, vector<Type> type)
 {
 	vector<string> clause;
-	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, " ,)(\r"))
+	for (char *p = strtok((char *)ligne.c_str(), "() ,\r"); p != NULL; p = strtok(NULL, "() ,\r"))
 	{
 		clause.push_back(p);
 		if (clause.size() > type.size())
