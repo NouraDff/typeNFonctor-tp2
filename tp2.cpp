@@ -14,15 +14,74 @@ using namespace std;
 static ArbreAVL<Type> arbreT = ArbreAVL<Type>();
 static ArbreAVL<Fonctor> arbreF = ArbreAVL<Fonctor>();
 
+/*
+   
+   
+    @params 
+    @return 
+*/
 void lecture(ifstream &);
+
+/*
+   Lit l'entrée vérifie que les types entrés sont uniques. 
+   
+    @params 
+    @return 
+*/
 void lectureArgumentsType(string, vector<string> &);
+
+/*
+    Met dans un vecteur la liste des types que contiennent les clauses du fonctor
+	et vérifie que le nombre de type correspond au nombre d'élément dans une clause. 
+   
+    @params 
+    @return 
+*/
 void lectureTypesFonc(string, vector<Type> &);
-void lectureClausesFonc(string, vector<vector<string>> &, vector<Type>);
+
+/*
+   Permet de vérifier pour chaque élément si le type dans la clause
+   existe puis l'insère dans dans le tableau de vector fonc. 
+   
+    @params ligne: ligne contenant l'entrée à lire
+			fonc: matrice contenant les clauses
+			type: vecteur contenant les types
+    @return 
+*/
+void lectureClausesFonc(string ligne, vector<vector<string>> &fonc, vector<Type> type);
+
+/*
+   
+   
+    @params 
+    @return 
+*/
 void lectureRequetes();
-bool estEnLettres(const char *);
+
+/*
+   Vérifie que la chaine de caractère ne contient que des lettres. 
+   
+    @params id: chaine de caratère
+    @return vrai si la chaine ne contient que des lettres, sinon faux. 
+*/
+bool estEnLettres(const char *id);
+
+/*
+	Vide le vecteur 
+   
+    @params vect: vecteur qui sera vider. 
+*/
 template <class T>
-void vider(vector<T> *);
+void vider(vector<T> *vect);
+
+/*
+   Affiche un message d'erreur et quitte le programme avec exit(1) 
+   
+    @params string: Le message d'erreur à afficher
+*/
 void erreur(const string);
+
+
 
 int main(int argc, const char **argv)
 {
