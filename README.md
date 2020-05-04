@@ -1,6 +1,6 @@
-## INF3105 - Structures de données et algorithmes
+## Travail Pratique
 ### Description   
-Ce programme est le résultats d'un travail pratique réalisé à l'UQAM à l'Hiver 2019. 
+Ce programme est le résultat d'un travail pratique réalisé à l'UQAM à l'Hiver 2019 dans le cadre du cours Structures de données et algorithmes. 
 Il a été réalisé par Laurianne Guindon et Noura Djaffri. 
 
 Ce programme permet de réaliser des requêtes afin consulter une base de connaissances. 
